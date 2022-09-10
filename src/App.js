@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter } from "react-router-dom";
+import Content from "./layout/Content";
+import Header from "./layout/Header";
+// import Content from "./layout/Content";
+// import ReactGA from "react-ga";
+import {
+  DEFAULT_BOARD_STATUSES,
+  FOOTER_HEIGHT,
+  TOP_BAR_HEIGHT,
+} from "src/constants";
+
+// const TRACKING_ID = "UA-238475580-1"; // OUR_TRACKING_ID
+// ReactGA.initialize(TRACKING_ID);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        {/* <Header /> */}
+        <Content />
+      </BrowserRouter>
+    </>
   );
 }
 
