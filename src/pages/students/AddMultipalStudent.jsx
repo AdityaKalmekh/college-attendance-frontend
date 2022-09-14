@@ -1,8 +1,7 @@
 import { Button, Dialog, Box } from "@mui/material";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import { addStudentCollection } from "../../../api/student";
-// import { addPropertyCollection } from "../../../api/property-collection";
+import { createStudent } from "../../api/student";
 
 const AddMultipleStudents = ({ openAddFileDialog, closeAddFileDialog }) => {
   const [data, setData] = useState();
@@ -10,7 +9,7 @@ const AddMultipleStudents = ({ openAddFileDialog, closeAddFileDialog }) => {
   const handleDataAddition = async () => {
     if (data) {
       for (let d of data) {
-        await addStudentCollection({
+        await createStudent({
           address: d.Address ? d.Address : "",
           fname: d.fname ? d.fname : "",
           mname: d.mname ? d.mname : "",

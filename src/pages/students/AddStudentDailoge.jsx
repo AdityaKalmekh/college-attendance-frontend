@@ -18,14 +18,10 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
-import { fireStorage } from "../../../firebase";
-//   import { fireStorage } from "../../../firebase";
+import { fireStorage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import CardMedia from "@mui/material/CardMedia";
-import {
-  addStudentCollection,
-  updateStudentCollection,
-} from "../../../api/student";
+import { createStudent, updateStudent } from "../../api/student";
 
 const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
   const formikRef = useRef();
@@ -71,12 +67,12 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
         if (currentRow.firebaseId) {
-          updateStudentCollection({
+          updateStudent({
             ...values,
             image: [...values.image, ...imageurl],
           });
         } else {
-          addStudentCollection({
+          createStudent({
             ...values,
             date: dayjs().format(),
             image: imageurl.map((d) => d),

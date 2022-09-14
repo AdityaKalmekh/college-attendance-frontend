@@ -1,31 +1,22 @@
 import { Button } from "@mui/material";
-import { getStudentCollections } from "../../../api/student";
-// import { getPropertyCollections } from "../../../api/property-collection";
+import { getStudent } from "../../api/student";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
 import StudentDialog from "./AddStudentDailoge";
-// import PropertyDialog from "./AddPropertyDialog";
 import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { More as MoreIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { deleteStudentCollection } from "../../../api/student";
-// import { deletePropertyCollection } from "../../../api/property-collection";
+import { deletestuentData } from "../../api/student";
 import AddMultipleStudents from "./AddMultipalStudent";
-// import AddMultipleProperties from "./AddMultipleProperties";
-// import ReactGA from "react-ga";
 import Checkbox from "@mui/material/Checkbox";
-import { updateStudentCollection } from "../../../api/student";
-// import { updatePropertyCollection } from "../../../api/property-collection";
+import { updateStudent } from "../../api/student";
 
 const StudentCollection = () => {
   const [open, setOpen] = useState(false);
   const [openAddFileDialog, setOpenAddFileDialog] = useState(false);
   const [studentCollection, setStudentCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  const navigate = useNavigate();
 
   const initialValues = {
     fname: "",
@@ -42,7 +33,7 @@ const StudentCollection = () => {
   };
 
   const loadData = () => {
-    getStudentCollections().then(setStudentCollection);
+    getStudent().then(setStudentCollection);
   };
 
   useEffect(() => {
@@ -69,7 +60,7 @@ const StudentCollection = () => {
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      deleteStudentCollection(row);
+      deletestuentData(row);
       loadData();
     }
   };
@@ -95,7 +86,7 @@ const StudentCollection = () => {
   };
 
   const handleSharedClick = (row) => async (event) => {
-    await updateStudentCollection({ ...row, shared: event.target.checked });
+    await updateStudent({ ...row, shared: event.target.checked });
     loadData();
   };
   const columns = [
