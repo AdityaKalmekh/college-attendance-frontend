@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-// import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
 import * as Yup from "yup";
@@ -26,12 +26,12 @@ const CreateUserForm = ({ handleClose, currentRow }) => {
       if (values) {
         if (currentRow.firebaseId) {
           updateExistingUser(values).then(() => {
-            // toast.success("User updated successfully");
+            toast.success("User updated successfully");
             handleClose();
           });
         } else {
           createNewUser(values).then(() => {
-            // toast.success("User created successfully");
+            toast.success("User created successfully");
             handleClose();
           });
         }

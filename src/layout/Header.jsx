@@ -5,6 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
 import newLogo from "../assets/images/newLogo.png";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
+import Person2Icon from "@mui/icons-material/Person2";
 import {
   Box,
   Divider,
@@ -77,8 +78,13 @@ const DRAWER_ITEMS = [
   },
   {
     route: "/student",
-    literal: "StudentCollection",
+    literal: "StudentDetails",
     Icon: EmojiPeopleIcon,
+  },
+  {
+    route: "/professor",
+    literal: "ProfessorDetails",
+    Icon: Person2Icon,
   },
 ];
 

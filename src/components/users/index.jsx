@@ -8,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { DataGrid } from "@mui/x-data-grid";
 import { GridActionsCellItem } from "@mui/x-data-grid-pro";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Loading from "../../common/Loader";
 import { useGlobalContext } from "../../context/GlobalContext";
 import useProgress from "../../hooks/useProgress";
@@ -71,7 +71,7 @@ const Users = () => {
     deleteUserData(row)
       .then(() => {
         loadData();
-        // toast.success("User Delete successfully");
+        toast.success("User Delete successfully");
       })
       .catch((err) => {
         console.log(err);

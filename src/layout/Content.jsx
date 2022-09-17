@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 // import CreateSale from 'src/pages/sales/CreateSale';
 import Users from "../components/users";
 import StudentCollection from "../pages/students/Student";
+import ProfessorCollection from "../pages/Professor/Professor";
 // import Sales from 'src/pages/sales/Sales';
 // import TaskBoard from 'src/pages/task-board';
 // import Customer from 'src/pages/customer';
@@ -16,10 +17,10 @@ const Content = () => {
   return (
     <Routes>
       {/* <Route exact path="/tasks/:saleId" element={<TaskBoard />} /> */}
-      {/* <Route exact path="/" element={<Sales />} /> */}
+      <Route exact path="/" element={<Users />} />
       <Route exact path="/users" element={<Users />} />
       <Route exact path="/student" element={<StudentCollection />} />
-      {/* <Route exact path="/supplier" element={<Supplier />} /> */}
+      <Route exact path="/professor" element={<ProfessorCollection />} />
       {/* <Route exact path="/product" element={<Product />} />
       <Route exact path="/invoice" element={<Invoice />} />
       <Route exact path="/purchase" element={<Purchase />} />
