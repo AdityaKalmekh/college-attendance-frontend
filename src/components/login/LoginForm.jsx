@@ -2,7 +2,7 @@
 import { useAuthContext } from "../../context/AuthContext";
 import Button from "@mui/material/Button";
 import SalesManager from "../../assets/images/newLogo.png";
-import { Alert, Avatar, Box, Grid, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Grid } from "@mui/material";
 import {
   loginButtonWidth,
   loginBackgroundImage,
@@ -40,18 +40,11 @@ const LoginForm = () => {
                 </Grid>
                 <Grid item md={6} xs={12} sx={{ mt: 8 }}>
                   <Box sx={fieldsFormContainer}>
-                    {/* <LoginWithUserNamePassword /> */}
+                    <LoginWithUserNamePassword />
                   </Box>
                   <Box>
                     <form>
                       <Box sx={loginButtonBox}>
-                        <Typography
-                          variant="h6"
-                          fontWeight="bold"
-                          sx={{ mb: 2 }}
-                        >
-                          Collage Attendence Systems
-                        </Typography>
                         <Button
                           sx={loginButtonWidth}
                           variant="contained"

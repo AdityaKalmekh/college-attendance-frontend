@@ -22,12 +22,6 @@ function Copyright({ textSx }) {
         sx={textSx}
       >
         {"Copyright © "}
-        {/* <Link color="inherit" href="https://newtonsystems.co.uk/" target="_blank">
-          Newton Systems ltd.
-        </Link>{' '} */}
-        {/* <Link color="inherit" href={company.sitelink} target="_blank">
-          {company.companyname}
-        </Link>{" "} */}
         {new Date().getFullYear()} all rights reserved.
       </Typography>
     </Box>

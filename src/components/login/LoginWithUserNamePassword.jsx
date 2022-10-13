@@ -39,8 +39,7 @@ const LoginWithUserNamePassword = () => {
         {(formik) => (
           <Form>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-              Log In to your account <br />
-              to continue to Track your deal
+              Collage Attendence Systems
             </Typography>
             <FormikController
               control="input"

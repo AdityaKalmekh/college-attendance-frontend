@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /** @jsxImportSource @emotion/react */
 import { LogoutOutlined } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -5,7 +6,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
 import newLogo from "../assets/images/newLogo.png";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
-import Person2Icon from "@mui/icons-material/Person2";
+import DomainIcon from "@mui/icons-material/Domain";
 import {
   Box,
   Divider,
@@ -20,7 +21,7 @@ import {
 import MuiAppBar from "@mui/material/AppBar";
 import MuiDrawer from "@mui/material/Drawer";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+// import { useState } from "react";
 import { Link } from "react-router-dom";
 // import Notifications from "src/components/notifications/Notifications";
 import { drawerWidth } from "../../src/constants/styleConstants";
@@ -72,6 +73,11 @@ const Drawer = styled(MuiDrawer, {
 
 const DRAWER_ITEMS = [
   {
+    route: "/signup",
+    literal: "Signup",
+    Icon: SupervisedUserCircleIcon,
+  },
+  {
     route: "/users",
     literal: "Users",
     Icon: SupervisedUserCircleIcon,
@@ -82,9 +88,9 @@ const DRAWER_ITEMS = [
     Icon: EmojiPeopleIcon,
   },
   {
-    route: "/professor",
-    literal: "ProfessorDetails",
-    Icon: Person2Icon,
+    route: "/branch",
+    literal: "Branch",
+    Icon: DomainIcon,
   },
 ];
 
@@ -116,7 +122,7 @@ const Header = () => {
 
   const { user, logout } = useAuthContext();
 
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   return (
     <Box>

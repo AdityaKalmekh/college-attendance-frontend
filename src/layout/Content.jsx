@@ -2,8 +2,8 @@ import { Route, Routes } from "react-router-dom";
 // import CreateSale from 'src/pages/sales/CreateSale';
 import Users from "../components/users";
 import StudentCollection from "../pages/students/Student";
-import ProfessorCollection from "../pages/Professor/Professor";
-// import Sales from 'src/pages/sales/Sales';
+import BranchCollection from "../pages/Professor/Branch";
+import SignupForm from "../pages/Signup/SignupForm";
 // import TaskBoard from 'src/pages/task-board';
 // import Customer from 'src/pages/customer';
 // import Supplier from 'src/pages/supplier';
@@ -20,9 +20,9 @@ const Content = () => {
       <Route exact path="/" element={<Users />} />
       <Route exact path="/users" element={<Users />} />
       <Route exact path="/student" element={<StudentCollection />} />
-      <Route exact path="/professor" element={<ProfessorCollection />} />
-      {/* <Route exact path="/product" element={<Product />} />
-      <Route exact path="/invoice" element={<Invoice />} />
+      <Route exact path="/branch" element={<BranchCollection />} />
+      <Route exact path="/signup" element={<SignupForm />} />
+      {/* <Route exact path="/invoice" element={<Invoice />} />
       <Route exact path="/purchase" element={<Purchase />} />
       <Route exact path="/create-sale" element={<CreateSale />} />
       <Route exact path="/profit-loss" element={<ProfitLoss />} />
