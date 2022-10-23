@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 // import CreateSale from 'src/pages/sales/CreateSale';
 import Users from "../components/users";
 import StudentCollection from "../pages/students/Student";
-import BranchCollection from "../pages/Professor/Branch";
+import BranchCollection from "../pages/Branch/Branch";
 import SignupForm from "../pages/Signup/SignupForm";
 // import TaskBoard from 'src/pages/task-board';
 // import Customer from 'src/pages/customer';

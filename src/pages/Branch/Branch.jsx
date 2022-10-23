@@ -1,25 +1,27 @@
 import { Button } from "@mui/material";
-import { getBranch, deletebranchData } from "../../api/Branch";
+import { getBranch } from "../../api/Branch";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
-import BranchDialog from "./AddBranchDailoge";
+import BranchDailog from "./AddBranchDailoge";
 import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-
+// import { deletestuentData } from "../../api/student";
+import { deletebranchData } from "../../api/Branch";
 const BranchCollection = () => {
   const [open, setOpen] = useState(false);
-  const [branchDetails, setbranchDetails] = useState([]);
+  const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
     bname: "",
     tsem: "",
+    tsub: "",
   };
 
   const loadData = () => {
-    getBranch().then(setbranchDetails);
+    getBranch().then(setBranchCollection);
   };
 
   useEffect(() => {
@@ -45,28 +47,19 @@ const BranchCollection = () => {
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
     setCurrentRow({
-      fname: row.fname ? row.fname : "",
-      mname: row.mname ? row.mname : "",
-      sname: row.sname ? row.sname : "",
-      address: row.address ? row.address : "",
-      enroll: row.enroll ? row.enroll : "",
-      priaddmitiondatece: row.addmitiondate ? row.addmitiondate : "",
-      course: row.course ? row.course : "",
-      sem: row.sem ? row.sem : "",
-      div: row.div ? row.div : "",
-      pcontact: row.pcontact ? row.pcontact : "",
-      scontact: row.scontact ? row.scontact : "",
-      image: row.image ? row.image : "",
-      shared: row.shared ? row.shared : "",
-      firebaseId: row.firebaseId,
+      bname: row.bname ? row.bname : "",
+      tsem: row.tsem ? row.tsem : "",
+      tsub: row.tsub ? row.t.sub : "",
     });
     setOpen(true);
   };
+
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "firebaseId", headerName: "ID", width: 200 },
-    { field: "bname", headerName: "Branch", width: 150 },
+    { field: "fname", headerName: "Branch Name", width: 150 },
     { field: "tsem", headerName: "Total Sem", width: 150 },
+    { field: "tsub", headerName: "Total Subject", width: 150 },
     {
       field: "delete",
       headerName: "Delete",
@@ -102,7 +95,7 @@ const BranchCollection = () => {
   return (
     <>
       {open && (
-        <BranchDialog
+        <BranchDailog
           open={open}
           onCancel={handleClickClose}
           loadData={loadData}
@@ -119,8 +112,8 @@ const BranchCollection = () => {
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={branchDetails?.map((student, index) => ({
-            ...student,
+          rows={branchCollection?.map((branch, index) => ({
+            ...branch,
             id: index + 1,
           }))}
           columns={columns}
