@@ -1,10 +1,10 @@
 import { css, Global } from "@emotion/react";
 import { BrowserRouter } from "react-router-dom";
-// import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import AppLayout from "./layout";
 import { AuthContextProvider } from "./context/AuthContext";
 import { LayoutContextProvider } from "./context/LayoutContext";
-// import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
 import { GlobalContextProvider } from "./context/GlobalContext";
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
         <AuthContextProvider>
           <GlobalContextProvider>
             <LayoutContextProvider>
-              {/* <ToastContainer /> */}
+              <ToastContainer />
               <AppLayout />
             </LayoutContextProvider>
           </GlobalContextProvider>

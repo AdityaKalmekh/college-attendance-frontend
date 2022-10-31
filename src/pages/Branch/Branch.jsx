@@ -17,7 +17,7 @@ const BranchCollection = () => {
   const initialValues = {
     bname: "",
     tsem: "",
-    tsub: "",
+    tsubname: "",
   };
 
   const loadData = () => {
@@ -49,7 +49,7 @@ const BranchCollection = () => {
     setCurrentRow({
       bname: row.bname ? row.bname : "",
       tsem: row.tsem ? row.tsem : "",
-      tsub: row.tsub ? row.t.sub : "",
+      tsubname: row.tsubname ? row.t.sub : [""],
     });
     setOpen(true);
   };
@@ -57,9 +57,9 @@ const BranchCollection = () => {
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "firebaseId", headerName: "ID", width: 200 },
-    { field: "fname", headerName: "Branch Name", width: 150 },
+    { field: "bname", headerName: "Branch Name", width: 150 },
     { field: "tsem", headerName: "Total Sem", width: 150 },
-    { field: "tsub", headerName: "Total Subject", width: 150 },
+    { field: "tsubname", headerName: "Total Subject", width: 150 },
     {
       field: "delete",
       headerName: "Delete",
@@ -97,7 +97,7 @@ const BranchCollection = () => {
       {open && (
         <BranchDailog
           open={open}
-          onCancel={handleClickClose}
+          handleClickClose={handleClickClose}
           loadData={loadData}
           currentRow={currentRow}
         />

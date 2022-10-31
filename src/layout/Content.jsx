@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Users from "../components/users";
 import StudentCollection from "../pages/students/Student";
 import BranchCollection from "../pages/Branch/Branch";
-import SignupForm from "../pages/Signup/SignupForm";
+import AttendenceCollection from "../pages/Attendance/AttendenceIndex";
 // import TaskBoard from 'src/pages/task-board';
 // import Customer from 'src/pages/customer';
 // import Supplier from 'src/pages/supplier';
@@ -21,7 +21,7 @@ const Content = () => {
       <Route exact path="/users" element={<Users />} />
       <Route exact path="/student" element={<StudentCollection />} />
       <Route exact path="/branch" element={<BranchCollection />} />
-      <Route exact path="/signup" element={<SignupForm />} />
+      <Route exact path="/attendance" element={<AttendenceCollection />} />
       {/* <Route exact path="/invoice" element={<Invoice />} />
       <Route exact path="/purchase" element={<Purchase />} />
       <Route exact path="/create-sale" element={<CreateSale />} />

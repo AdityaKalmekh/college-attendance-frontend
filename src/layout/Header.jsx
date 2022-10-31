@@ -7,6 +7,7 @@ import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
 import newLogo from "../assets/images/newLogo.png";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import DomainIcon from "@mui/icons-material/Domain";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import {
   Box,
   Divider,
@@ -72,11 +73,11 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const DRAWER_ITEMS = [
-  {
-    route: "/signup",
-    literal: "Signup",
-    Icon: SupervisedUserCircleIcon,
-  },
+  // {
+  //   route: "/signup",
+  //   literal: "Signup",
+  //   Icon: SupervisedUserCircleIcon,
+  // },
   {
     route: "/users",
     literal: "Users",
@@ -91,6 +92,11 @@ const DRAWER_ITEMS = [
     route: "/branch",
     literal: "Branch",
     Icon: DomainIcon,
+  },
+  {
+    route: "/Attendance",
+    literal: "AttendenceCollection",
+    Icon: AutoStoriesIcon,
   },
 ];
 

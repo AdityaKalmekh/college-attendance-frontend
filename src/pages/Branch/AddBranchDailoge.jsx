@@ -1,37 +1,49 @@
-/* eslint-disable no-unused-vars */
-import {
-  DialogTitle,
-  TextField,
-  Button,
-  Box,
-  Dialog,
-  Grid,
-  Select,
-} from "@material-ui/core";
+import { Grid, Button, TextField } from "@mui/material";
+import { toast } from "react-toastify";
+import Modal from "../../common/Modal";
 import * as React from "react";
 import { useRef, useState } from "react";
+import useProgress from "../../hooks/useProgress";
 import { Form, Formik } from "formik";
-import { createStudent, updateStudent } from "../../api/student";
-import { MenuItem } from "@mui/material";
+import Loading from "../../common/Loader";
+import FormikController from "../../formik/FormikController";
+import { createBranch, updateBranch } from "../../api/Branch";
 
-const BranchDailog = ({ open, onCancel, loadData, currentRow }) => {
+const BranchDailog = ({
+  handleClickClose,
+  open,
+  onCancel,
+  loadData,
+  currentRow,
+}) => {
   const formikRef = useRef();
-  const [fieldvalues, setFieldValues] = useState([{}]);
-  console.log({ fieldvalues });
+  const [createNewInvoice, createLoading] = useProgress(createBranch);
+  const [updateExistingInvioce, updateLoading] = useProgress(updateBranch);
+  const [fieldvalues, setFieldValues] = useState();
+  const [totalSem, setTotalSem] = useState();
+  console.log({ totalSem });
+  console.log(fieldvalues);
   const [counter, setCounter] = useState(0);
-  const [inputValues, setInputValues] = useState();
-  const onSubmit = () => {
+  // const [inputValues, setInputValues] = useState();
+  // console.log(inputValues);
+  const onOk = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
+        const modifiedValues = {
+          ...values,
+          tsem: totalSem,
+        };
         if (currentRow.firebaseId) {
-          updateStudent({
-            ...values,
+          updateExistingInvioce(modifiedValues).then(() => {
+            toast.success("Branch updated successfully");
+            handleClickClose();
           });
         } else {
-          createStudent({});
+          createNewInvoice(modifiedValues).then(() => {
+            toast.success("Branch created successfully");
+            handleClickClose();
+          });
         }
-        onCancel();
-        loadData();
       }
     });
   };
@@ -41,116 +53,135 @@ const BranchDailog = ({ open, onCancel, loadData, currentRow }) => {
   };
 
   const handleOnChange = (e) => {
+    const N = e.target.value;
+    setTotalSem(N);
     let arr = [];
     for (let i = 1; i <= e.target.value; i++) {
       arr.push(i);
-      console.log(i);
     }
-    console.log(arr);
     setFieldValues(arr);
   };
 
   return (
-    <>
-      <Dialog fullWidth open={open} onClose={onCancel}>
-        <Box>
-          <DialogTitle style={{ paddingBottom: "0px" }}>
-            Add Branch Details
-          </DialogTitle>
+    <Modal
+      title={currentRow.firebaseId ? "Update Branch" : "Create Branch"}
+      fullScreen
+      onOk={onOk}
+      onCancel={handleClickClose}
+      sx={{ minHeight: (createLoading || updateLoading) && "200px" }}
+    >
+      {createLoading || updateLoading ? (
+        <Loading
+          title={
+            currentRow.firebaseId
+              ? "Please wait updating your details..."
+              : "Please wait creating your details..."
+          }
+          top="65%"
+        />
+      ) : (
+        <Grid item xs={10} border="solid" borderRadius="1rem">
           <Formik
             innerRef={formikRef}
             initialValues={currentRow}
             onSubmit={(values) => values}
           >
             {(formik) => (
-              <Form style={{ padding: "30px", paddingTop: "0px" }}>
-                <Grid item container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      control="input"
-                      type="text"
-                      label="Branch Name"
-                      name="bname"
-                      fullWidth
-                      value={formik.values.bname}
-                      onChange={formik.handleChange}
-                      error={
-                        formik.touched.bname && Boolean(formik.errors.bname)
-                      }
-                      helperText={formik.touched.bname && formik.errors.bname}
-                    />
+              <Form>
+                <Grid
+                  container
+                  display="flex"
+                  flex-direction="row"
+                  padding="1rem"
+                >
+                  <Grid item container xs={3} align="center" marginRight="1rem">
+                    <Grid item>
+                      <FormikController
+                        control="input"
+                        type="text"
+                        label="Branch Name"
+                        name="bname"
+                        value={formik.values.bname}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.bname && Boolean(formik.errors.bname)
+                        }
+                        helperText={formik.touched.bname && formik.errors.bname}
+                      />
+                    </Grid>
+                    <Grid item xs={12} textAlign="left" paddingTop="1rem">
+                      <FormikController
+                        control="input"
+                        type="number"
+                        label="Total Sem"
+                        name="tsem"
+                        onChange={handleOnChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} textAlign="left" paddingTop="1rem">
+                      <FormikController
+                        control="select"
+                        type="nember"
+                        label="Select Sem For Subject"
+                        name="semfsub"
+                        fullWidth
+                        options={fieldvalues?.map((option) => ({
+                          value: option,
+                          label: option,
+                        }))}
+                        value={formik.values.semfsub}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.semfsub &&
+                          Boolean(formik.errors.semfsub)
+                        }
+                        helperText={
+                          formik.touched.semfsub && formik.errors.semfsub
+                        }
+                      />
+                    </Grid>
                   </Grid>
-                  <br />
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      control="input"
-                      type="text"
-                      label="Total Sem"
-                      name="tsem"
-                      fullWidth
-                      // value={fieldvalues}
-                      onChange={handleOnChange}
-                      // error={formik.touched.tsem && Boolean(formik.errors.tsem)}
-                      // helperText={formik.touched.tsem && formik.errors.tsem}
-                    />
-                  </Grid>
-                  <br />
-                  <Grid item xs={12} md={6}>
-                    <Select
-                      label="Total Subject"
-                      name="tsub"
-                      fullWidth
-                      value={formik.values.tsub}
-                      onChange={formik.handleChange}
-                      error={formik.touched.tsub && Boolean(formik.errors.tsub)}
-                      helperText={formik.touched.tsub && formik.errors.tsub}
-                    >
-                      {/* {fieldvalues?.slice().map((option) => {
-                        console.log(option);
-                        return <MenuItem key={option}>{option}</MenuItem>;
-                      })} */}
-                      <MenuItem>{fieldvalues}</MenuItem>
-                    </Select>
-                  </Grid>
-                  <br />
-                  <Grid item md={12} xs={12}>
-                    <Box sx={{ border: "2px solid black" }}>
-                      <Button variant="contained" onClick={handleClick}>
-                        + Add Subject
-                      </Button>
-                      {Array.from(Array(counter)).map((c, index) => {
-                        return (
-                          <TextField
-                            // onChange={handleOnChange}
-                            key={c}
-                            className={index}
-                            type="text"
-                            value={formik.values.tsubname}
-                            onChange={formik.handleChange}
-                            error={
-                              formik.touched.tsem &&
-                              Boolean(formik.errors.tsubname)
-                            }
-                            helperText={
-                              formik.touched.tsem && formik.errors.tsubname
-                            }
-                          />
-                        );
-                      })}
-                    </Box>
+                  <Grid item xs={6} borderLeft="4px solid">
+                    {typeof fieldvalues === "undefined" ? (
+                      <Grid></Grid>
+                    ) : (
+                      <>
+                        <Grid marginLeft="1rem">
+                          <Button variant="contained" onClick={handleClick}>
+                            + Add Subject
+                          </Button>
+                        </Grid>
+                        <Grid marginLeft="1rem" marginTop="1rem">
+                          {Array.from(Array(counter)).map((c, index) => {
+                            return (
+                              <TextField
+                                key={c}
+                                className={index}
+                                type="text"
+                                value={formik.values.tsubname}
+                                onChange={formik.handleChange}
+                                error={
+                                  formik.touched.tsubname &&
+                                  Boolean(formik.errors.tsubname)
+                                }
+                                helperText={
+                                  formik.touched.tsubname &&
+                                  formik.errors.tsubname
+                                }
+                              />
+                            );
+                          })}
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Grid>
-                <br />
-                <br />
-                <Button onClick={onSubmit} variant="contained" type="submit">
-                  Submit
-                </Button>
               </Form>
             )}
           </Formik>
-        </Box>
-      </Dialog>
-    </>
+        </Grid>
+      )}
+    </Modal>
   );
 };
 

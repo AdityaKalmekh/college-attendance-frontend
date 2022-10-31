@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-// import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { Button, Typography } from "@mui/material";
 import FormikController from "../../formik/FormikController";
 import { loginWithEmailAndPassword } from "../../api/auth";
@@ -23,10 +23,10 @@ const LoginWithUserNamePassword = () => {
           resetForm();
         })
         .catch((err) => {
-          // toast.error(err.message);
+          toast.error(err.message);
         });
     } else {
-      // toast.error('Something went wrong');
+      toast.error("Something went wrong");
     }
   };
   return (
@@ -38,8 +38,11 @@ const LoginWithUserNamePassword = () => {
       >
         {(formik) => (
           <Form>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+            <Typography variant="h5" fontWeight="bold" sx={{ mb: 2 }}>
               Collage Attendence Systems
+            </Typography>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+              Login
             </Typography>
             <FormikController
               control="input"

@@ -21,7 +21,7 @@ export const loginSection = css`
 export const loginSectionContainer = css`
   position: relative;
   width: 800px;
-  height: 500px;
+  height: auto;
   background: #fff;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -64,7 +64,7 @@ export const formContainer = css`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
 `;
 export const fieldsFormContainer = css`
@@ -73,6 +73,10 @@ export const fieldsFormContainer = css`
 `;
 export const loginButtonBox = css`
   text-align: center;
+`;
+export const createButtonBox = css`
+  text-align: center;
+  padding: 1rem;
 `;
 export const loginButtonWidth = css`
   width: 200px;
