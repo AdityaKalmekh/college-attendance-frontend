@@ -1,103 +1,99 @@
-import AddIcon from "@mui/icons-material/Add";
-import Button from "@mui/material/Button";
-import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Button } from "@mui/material";
+import { getStudent } from "../../api/student";
+import { DataGrid } from "@mui/x-data-grid";
+
 import { css } from "@emotion/react";
-import { deletestuentData, getStudent } from "../../api/student";
+import StudentDialog from "./AddStudentDailoge";
+import { useState, useEffect } from "react";
+import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid } from "@mui/x-data-grid";
-import { GridActionsCellItem } from "@mui/x-data-grid-pro";
-import { toast } from "react-toastify";
-import Loading from "../../common/Loader";
-import useProgress from "../../hooks/useProgress";
-import ConfirmDialog from "../../common/ConFirmDialog";
-// import CreateProductForm from "./dialogForproduct";
-import StudentDialog from "./AddStudentDailoge";
+import { deletestuentData } from "../../api/student";
+import AddMultipleStudents from "./AddMultipalStudent";
+import Checkbox from "@mui/material/Checkbox";
+import { updateStudent } from "../../api/student";
 
-const initialValues = {
-  hsn: "",
-  product: "",
-  igst: "",
-  cgst: "",
-  firebaseId: "",
-};
-
-const Product = () => {
-  const [product, setProduct] = useState([]);
-  console.log(product);
-  const [currentRow, setCurrentRow] = useState(initialValues);
+const StudentCollection = () => {
   const [open, setOpen] = useState(false);
-  const [confirmDialog, setConfirmDialog] = useState({
-    isOpen: false,
-    title: "",
-    subTitle: "",
-  });
+  const [openAddFileDialog, setOpenAddFileDialog] = useState(false);
+  const [studentCollection, setStudentCollection] = useState([]);
+  const [currentRow, setCurrentRow] = useState();
 
-  const [getAllProduct, loading] = useProgress(getStudent);
-  const handleClickOpen = () => {
-    setCurrentRow(initialValues);
-    setOpen(true);
+  const initialValues = {
+    fname: "",
+    mname: "",
+    sname: "",
+    address: "",
+    enroll: "",
+    addmitiondate: "",
+    course: "",
+    sem: "",
+    div: "",
+    pcontact: "",
+    scontact: "",
   };
 
   const loadData = () => {
-    getAllProduct().then((res) => {
-      setProduct(res);
-      // console.log(res);
-    });
+    getStudent().then(setStudentCollection);
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const handleClose = () => {
-    loadData();
+  const handleClickOpen = () => {
+    setCurrentRow(initialValues);
+    setOpen(true);
+  };
+
+  const handleClickClose = () => {
     setOpen(false);
   };
 
+  const handleOpenAddFileDialog = () => {
+    setOpenAddFileDialog(true);
+  };
+
+  const handleCloseAddFileDialog = () => {
+    setOpenAddFileDialog(false);
+  };
+
+  const handleDeleteClick = (row) => (event) => {
+    event.stopPropagation();
+    if (window.confirm("Are you sure to delete?") === true) {
+      console.log(row);
+      deletestuentData(row);
+      loadData();
+    }
+  };
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
     setCurrentRow({
-      hsn: row.hsn ? row.hsn : initialValues.hsn,
-      product: row.product ? row.product : initialValues.product,
-      igst: row.igst ? row.igst : initialValues.igst,
-      cgst: row.cgst ? row.cgst : initialValues.cgst,
+      fname: row.fname ? row.fname : "",
+      mname: row.mname ? row.mname : "",
+      sname: row.sname ? row.sname : "",
+      address: row.address ? row.address : "",
+      enroll: row.enroll ? row.enroll : "",
+      priaddmitiondatece: row.addmitiondate ? row.addmitiondate : "",
+      course: row.course ? row.course : "",
+      sem: row.sem ? row.sem : "",
+      div: row.div ? row.div : "",
+      pcontact: row.pcontact ? row.pcontact : "",
+      scontact: row.scontact ? row.scontact : "",
+      image: row.image ? row.image : "",
+      shared: row.shared ? row.shared : "",
       firebaseId: row.firebaseId,
     });
     setOpen(true);
   };
 
-  const onDelete = (row) => {
-    setConfirmDialog({
-      ...confirmDialog,
-      isOpen: false,
-    });
-    deletestuentData(row)
-      .then(() => {
-        loadData();
-        toast.success("Product Delete successfully");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const handleSharedClick = (row) => async (event) => {
+    await updateStudent({ ...row, shared: event.target.checked });
+    loadData();
   };
-
-  const handleDeleteClick = (row) => (event) => {
-    event.stopPropagation();
-    setConfirmDialog({
-      isOpen: true,
-      title: "Are you sure to delete this record?",
-      subTitle: "You can't undo this operation",
-      onConfirm: () => {
-        onDelete(row);
-      },
-    });
-  };
-
   const columns = [
-    // { field: "id", headerName: "SR.", width: 50 },
-    // { field: "firebaseId", headerName: "ID", width: 200 },
+    { field: "id", headerName: "SR.", width: 50 },
+    { field: "firebaseId", headerName: "ID", width: 200 },
     { field: "fname", headerName: "First Name", width: 150 },
     { field: "mname", headerName: "Middle Name", width: 150 },
     { field: "sname", headerName: "SureName", width: 150 },
@@ -139,51 +135,88 @@ const Product = () => {
         </strong>
       ),
     },
+    // {
+    //   field: "more",
+    //   headerName: "More",
+    //   width: 80,
+    //   renderCell: ({ row }) => (
+    //     <strong>
+    //       <GridActionsCellItem
+    //       // icon={<MoreIcon />}
+    //       // label="More"
+    //       // onClick={() => {
+    //       //   ReactGA.event({
+    //       //     category: row.name,
+    //       //     action: "test action",
+    //       //     label: "test label",
+    //       //     value: row.price,
+    //       //   });
+    //       //   navigate(`/${row.city}/${row.area}/${row.firebaseId}`);
+    //       // }}
+    //       // color="inherit"
+    //       />
+    //     </strong>
+    //   ),
+    // },
+    {
+      field: "Shared",
+      headerName: "Shared",
+      width: 80,
+      renderCell: ({ row }) => (
+        <strong>
+          <GridActionsCellItem
+            icon={<Checkbox checked={row?.shared} />}
+            label="Check"
+            onClick={handleSharedClick(row)}
+            color="inherit"
+          />
+        </strong>
+      ),
+    },
   ];
 
   return (
-    <Box>
-      {loading ? (
-        <Loading title="Loading Users..." />
-      ) : (
-        <>
-          <Button
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleClickOpen}
-          >
-            Add Product
-          </Button>
-          {open && (
-            <StudentDialog handleClose={handleClose} currentRow={currentRow} />
-          )}
-          <div style={{ height: 475, width: "100%" }}>
-            <DataGrid
-              editMode="row"
-              rows={product?.map((item, index) => {
-                // console.log(product);
-                return {
-                  ...item,
-                  id: index + 1,
-                };
-              })}
-              columns={columns}
-              css={css`
-                height: calc(100vh - 1500px - 30px) !important;
-              `}
-              experimentalFeatures={{ newEditingApi: true }}
-            />
-          </div>
-          {confirmDialog && (
-            <ConfirmDialog
-              confirmDialog={confirmDialog}
-              setConfirmDialog={setConfirmDialog}
-            />
-          )}
-        </>
+    <>
+      {open && (
+        <StudentDialog
+          open={open}
+          onCancel={handleClickClose}
+          loadData={loadData}
+          currentRow={currentRow}
+        />
       )}
-    </Box>
+      {openAddFileDialog && (
+        <AddMultipleStudents
+          openAddFileDialog={openAddFileDialog}
+          closeAddFileDialog={handleCloseAddFileDialog}
+        />
+      )}
+      <Button
+        onClick={handleClickOpen}
+        variant="contained"
+        sx={{ margin: "10px" }}
+      >
+        Add
+      </Button>
+      <Button onClick={handleOpenAddFileDialog} variant="contained">
+        Add From Excel File
+      </Button>
+      <div style={{ height: 475, width: "100%" }}>
+        <DataGrid
+          editMode="row"
+          rows={studentCollection?.map((student, index) => ({
+            ...student,
+            id: index + 1,
+          }))}
+          columns={columns}
+          css={css`
+            height: calc(100vh - 1500px - 30px) !important;
+          `}
+          experimentalFeatures={{ newEditingApi: true }}
+        />
+      </div>
+    </>
   );
 };
 
-export default Product;
+export default StudentCollection;
