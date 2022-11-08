@@ -80,7 +80,7 @@ const StudentCollection = () => {
       scontact: row.scontact ? row.scontact : "",
       image: row.image ? row.image : "",
       shared: row.shared ? row.shared : "",
-      firebaseId: row.firebaseId,
+      firebaseId: row._id,
     });
     setOpen(true);
   };
