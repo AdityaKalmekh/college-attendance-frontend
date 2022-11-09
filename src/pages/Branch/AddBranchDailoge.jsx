@@ -24,8 +24,9 @@ const BranchDailog = ({
   console.log({ totalSem });
   console.log(fieldvalues);
   const [counter, setCounter] = useState(0);
-  // const [inputValues, setInputValues] = useState();
-  // console.log(inputValues);
+  const [subject, setsubject] = useState([]);
+
+  console.log(subject);
   const onOk = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
@@ -61,6 +62,14 @@ const BranchDailog = ({
     }
     setFieldValues(arr);
   };
+
+  const semhandler = (e) =>{
+    console.log(e.target.value);
+  }
+
+  const addSubject = (e) => {
+    setsubject(e.target.value);
+  }
 
   return (
     <Modal
@@ -129,15 +138,15 @@ const BranchDailog = ({
                           value: option,
                           label: option,
                         }))}
-                        value={formik.values.semfsub}
-                        onChange={formik.handleChange}
-                        error={
-                          formik.touched.semfsub &&
-                          Boolean(formik.errors.semfsub)
-                        }
-                        helperText={
-                          formik.touched.semfsub && formik.errors.semfsub
-                        }
+  
+                        onChange={semhandler}
+                        // error={
+                        //   formik.touched.semfsub &&
+                        //   Boolean(formik.errors.semfsub)
+                        // }
+                        // helperText={
+                        //   formik.touched.semfsub && formik.errors.semfsub
+                        // }
                       />
                     </Grid>
                   </Grid>
@@ -158,16 +167,16 @@ const BranchDailog = ({
                                 key={c}
                                 className={index}
                                 type="text"
-                                value={formik.values.tsubname}
-                                onChange={formik.handleChange}
-                                error={
-                                  formik.touched.tsubname &&
-                                  Boolean(formik.errors.tsubname)
-                                }
-                                helperText={
-                                  formik.touched.tsubname &&
-                                  formik.errors.tsubname
-                                }
+                                // value={formik.values.tsubname}
+                                onChange={addSubject}
+                                // error={
+                                //   formik.touched.tsubname &&
+                                //   Boolean(formik.errors.tsubname)
+                                // }
+                                // helperText={
+                                //   formik.touched.tsubname &&
+                                //   formik.errors.tsubname
+                                // }
                               />
                             );
                           })}
