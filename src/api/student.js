@@ -21,7 +21,7 @@ export const getStudent = async () => {
   studentData.data.students.map((student) => {
     return dt.push(student);
   });
-  console.log(dt);
+  // console.log(dt);
   return dt;
 };
 

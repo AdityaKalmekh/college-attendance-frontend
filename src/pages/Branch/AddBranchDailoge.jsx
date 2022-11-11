@@ -19,58 +19,101 @@ const BranchDailog = ({
   const formikRef = useRef();
   const [createNewInvoice, createLoading] = useProgress(createBranch);
   const [updateExistingInvioce, updateLoading] = useProgress(updateBranch);
-  const [fieldvalues, setFieldValues] = useState();
-  const [totalSem, setTotalSem] = useState();
-  console.log({ totalSem });
-  console.log(fieldvalues);
+  const [fieldvalues, setFieldValues] = useState([]);
   const [counter, setCounter] = useState(0);
   const [subject, setsubject] = useState([]);
+  const [branch,setbranch] = useState();
+  const [currentsem, setcurrentsem] = useState();
+  const [subsem,setsubsem] = useState({});
+  console.log(subsem);
 
-  console.log(subject);
   const onOk = () => {
-    formikRef.current.submitForm().then((values) => {
-      if (values) {
-        const modifiedValues = {
-          ...values,
-          tsem: totalSem,
-        };
-        if (currentRow.firebaseId) {
-          updateExistingInvioce(modifiedValues).then(() => {
-            toast.success("Branch updated successfully");
-            handleClickClose();
-          });
-        } else {
-          createNewInvoice(modifiedValues).then(() => {
-            toast.success("Branch created successfully");
-            handleClickClose();
-          });
-        }
-      }
-    });
+    const branchContainer = {
+      [branch] : subsem
+    }
+    console.log(branchContainer);
+    console.log(branchContainer); 
+    if (branchContainer){
+      createNewInvoice(branchContainer).then(() =>{
+        toast.success("Branch created successfully");
+        handleClickClose();
+      })
+    }
+    // formikRef.current.submitForm().then((values) => {
+    //   if (values) {
+    //     const modifiedValues = {
+    //       ...values,
+    //       tsem: totalSem,
+    //     };
+    //     if (currentRow.firebaseId) {
+    //       updateExistingInvioce(modifiedValues).then(() => {
+    //         toast.success("Branch updated successfully");
+    //         handleClickClose();
+    //       });
+    //     } else {
+    //       createNewInvoice(modifiedValues).then(() => {
+    //         toast.success("Branch created successfully");
+    //         handleClickClose();
+    //       });
+    //     }
+    //   }
+    // });
   };
 
   const handleClick = () => {
+    // container[0].setTotalSem = setTotalSem.map(({subject})=>{
+    //   let obj = {subject};
+    //   return obj;
+    // })
+    // console.log(container);
     setCounter(counter + 1);
   };
 
   const handleOnChange = (e) => {
-    const N = e.target.value;
-    setTotalSem(N);
     let arr = [];
     for (let i = 1; i <= e.target.value; i++) {
       arr.push(i);
+      setsubsem(prev =>{
+        return {...prev,[i] : "null"}});
     }
     setFieldValues(arr);
   };
-
+  
+  // console.log(bsubsem);
+  // for (const[key,value] of Object.entries(subsem)){
+  //   console.log(key,value);
+  // }
+  // console.log(subsem);
   const semhandler = (e) =>{
     console.log(e.target.value);
+    setcurrentsem(e.target.value);
+    if (currentsem >= 1){
+      setsubsem(prev =>{
+        return {
+          ...prev,
+          [currentsem] : subject
+        }
+      })
+    }  
+    setsubject([]);
   }
 
   const addSubject = (e) => {
-    setsubject(e.target.value);
+    console.log(e.target.value);
+    setsubject(...subject,e.target.value);
   }
 
+  const branchHandler = (e) => {
+    const currentb = e.target.value;
+    setbranch(currentb);
+  }
+
+  // const addmap = (e) =>{
+  //   setbsubsem(prev =>{
+  //     return {...prev,[branch]: subsem}
+  //   })
+  // }
+  
   return (
     <Modal
       title={currentRow.firebaseId ? "Update Branch" : "Create Branch"}
@@ -110,12 +153,12 @@ const BranchDailog = ({
                         type="text"
                         label="Branch Name"
                         name="bname"
-                        value={formik.values.bname}
-                        onChange={formik.handleChange}
-                        error={
-                          formik.touched.bname && Boolean(formik.errors.bname)
-                        }
-                        helperText={formik.touched.bname && formik.errors.bname}
+                        value={branch}
+                        onChange={branchHandler}
+                        // error={
+                        //   formik.touched.bname && Boolean(formik.errors.bname)
+                        // }
+                        // helperText={formik.touched.bname && formik.errors.bname}
                       />
                     </Grid>
                     <Grid item xs={12} textAlign="left" paddingTop="1rem">
@@ -138,15 +181,7 @@ const BranchDailog = ({
                           value: option,
                           label: option,
                         }))}
-  
                         onChange={semhandler}
-                        // error={
-                        //   formik.touched.semfsub &&
-                        //   Boolean(formik.errors.semfsub)
-                        // }
-                        // helperText={
-                        //   formik.touched.semfsub && formik.errors.semfsub
-                        // }
                       />
                     </Grid>
                   </Grid>
@@ -159,6 +194,9 @@ const BranchDailog = ({
                           <Button variant="contained" onClick={handleClick}>
                             + Add Subject
                           </Button>
+                          {/* <Button variant="contained" onClick={addmap}>
+                            + Add Subject
+                          </Button> */}
                         </Grid>
                         <Grid marginLeft="1rem" marginTop="1rem">
                           {Array.from(Array(counter)).map((c, index) => {
@@ -167,16 +205,7 @@ const BranchDailog = ({
                                 key={c}
                                 className={index}
                                 type="text"
-                                // value={formik.values.tsubname}
                                 onChange={addSubject}
-                                // error={
-                                //   formik.touched.tsubname &&
-                                //   Boolean(formik.errors.tsubname)
-                                // }
-                                // helperText={
-                                //   formik.touched.tsubname &&
-                                //   formik.errors.tsubname
-                                // }
                               />
                             );
                           })}

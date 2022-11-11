@@ -23,7 +23,8 @@ const BranchCollection = () => {
   const loadData = () => {
     getBranch().then(setBranchCollection);
   };
-
+  
+  console.log(branchCollection);
   useEffect(() => {
     loadData();
   }, []);
