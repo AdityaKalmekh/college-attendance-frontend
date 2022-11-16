@@ -21,7 +21,7 @@ export const getStudent = async () => {
   studentData.data.students.map((student) => {
     return dt.push(student);
   });
-  // console.log(dt);
+  console.log(dt);
   return dt;
 };
 
@@ -36,7 +36,7 @@ export const createStudent = async (values) => {
 
 export const updateStudent = async (values) => {
   try {
-    await setDoc(doc(firestore, "student", values.firebaseId), values);
+    return http.put("/editStudent",values);
   } catch (err) {
     console.log({ err });
   }

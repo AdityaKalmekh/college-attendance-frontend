@@ -15,7 +15,6 @@ export const getBranch = async () => {
   branchData.data.branches.map((branch) =>{
     return data.push(branch);
   })
-  console.log(data);
   // const querySnapshot = await getDocs(collection(firestore, "branch"));
   // querySnapshot.forEach((document) => {
   //   data.push({ ...document.data(), firebaseId: document.id });
@@ -24,7 +23,6 @@ export const getBranch = async () => {
 };
 
 export const createBranch = async (values) => {
-  console.log(values);
   return http.post("/addBranch",values);
   // try {
   //   await addDoc(collection(firestore, "branch"), values);

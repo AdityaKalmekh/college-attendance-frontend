@@ -21,18 +21,26 @@ const BranchDailog = ({
   const [updateExistingInvioce, updateLoading] = useProgress(updateBranch);
   const [fieldvalues, setFieldValues] = useState([]);
   const [counter, setCounter] = useState(0);
-  const [subject, setsubject] = useState([]);
   const [branch,setbranch] = useState();
   const [currentsem, setcurrentsem] = useState();
-  const [subsem,setsubsem] = useState({});
-  console.log(subsem);
+  const [semesters,setSemesters] = useState([]);
+  const [container,setcontainer] = useState([]);
 
   const onOk = () => {
+    semesters.forEach(function(item){
+      container.forEach(function(item2){
+        if (item.sem_name === item2.sem){
+          item.subject.push(item2.subject);
+        }
+      })
+    })
+
     const branchContainer = {
-      [branch] : subsem
+      "branch_name" : branch,
+      "semesters" : semesters
     }
     console.log(branchContainer);
-    console.log(branchContainer); 
+    // console.log(branchContainer); 
     if (branchContainer){
       createNewInvoice(branchContainer).then(() =>{
         toast.success("Branch created successfully");
@@ -73,50 +81,32 @@ const BranchDailog = ({
     let arr = [];
     for (let i = 1; i <= e.target.value; i++) {
       arr.push(i);
-      setsubsem(prev =>{
-        return {...prev,[i] : "null"}});
+      setSemesters(prev =>{
+        return [...prev,{"sem_name" : i,"subject":[]}]});
     }
     setFieldValues(arr);
   };
-  
-  // console.log(bsubsem);
-  // for (const[key,value] of Object.entries(subsem)){
-  //   console.log(key,value);
-  // }
-  // console.log(subsem);
+  console.log(semesters);
+ 
   const semhandler = (e) =>{
-    console.log(e.target.value);
     setcurrentsem(e.target.value);
-    if (currentsem >= 1){
-      setsubsem(prev =>{
-        return {
-          ...prev,
-          [currentsem] : subject
-        }
-      })
-    }  
-    setsubject([]);
   }
 
   const addSubject = (e) => {
-    console.log(e.target.value);
-    setsubject(...subject,e.target.value);
+        setcontainer(prev =>{
+        return [...prev,{"sem": currentsem,"subject": e.target.value}]
+    })
   }
+  console.log(container);
 
   const branchHandler = (e) => {
     const currentb = e.target.value;
     setbranch(currentb);
   }
-
-  // const addmap = (e) =>{
-  //   setbsubsem(prev =>{
-  //     return {...prev,[branch]: subsem}
-  //   })
-  // }
-  
+  console.log(currentRow);
   return (
     <Modal
-      title={currentRow.firebaseId ? "Update Branch" : "Create Branch"}
+      title={currentRow._id ? "Update Branch" : "Create Branch"}
       fullScreen
       onOk={onOk}
       onCancel={handleClickClose}

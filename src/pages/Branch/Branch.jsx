@@ -9,10 +9,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 // import { deletestuentData } from "../../api/student";
 import { deletebranchData } from "../../api/Branch";
+
 const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
+  const [branchArray,setBranchArray] = useState([]);
 
   const initialValues = {
     bname: "",
@@ -20,14 +22,35 @@ const BranchCollection = () => {
     tsubname: "",
   };
 
+
+  const displayData= () =>{
+    branchCollection.forEach(function (item){
+      const bname = item.branch_name;
+      const totalsem = item.semesters.length
+      let totalsub = 0;
+      item.semesters.forEach(function (item2){
+        totalsub += item2.subject.length
+      })
+      setBranchArray(prev =>{
+        return [...prev,{"branch_name":bname,"semesters":totalsem,"subject":totalsub}]
+      });
+    })
+  }
+
   const loadData = () => {
     getBranch().then(setBranchCollection);
+    displayData();
   };
   
-  console.log(branchCollection);
+  // useEffect(() =>{
+  //   displayData()
+  // },[setBranchCollection])
+  
+  // console.log(branchCollection);
   useEffect(() => {
     loadData();
-  }, []);
+    // displayData();
+  },[]);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -46,20 +69,23 @@ const BranchCollection = () => {
     }
   };
   const handleEditClick = (row) => (event) => {
+    console.log(row);
     event.stopPropagation();
     setCurrentRow({
-      bname: row.bname ? row.bname : "",
-      tsem: row.tsem ? row.tsem : "",
-      tsubname: row.tsubname ? row.t.sub : [""],
+      branch_name: row.branch_name ? row.branch_name : "",
+      semesters: row.semesters ? row.semesters : "",
+      subject: row.subject ? row.subject : "",
     });
     setOpen(true);
   };
 
+  
+
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "firebaseId", headerName: "ID", width: 200 },
-    { field: "bname", headerName: "Branch Name", width: 150 },
-    { field: "tsem", headerName: "Total Sem", width: 150 },
+    { field: "branch_name", headerName: "Branch Name", width: 150 },
+    { field: "semesters", headerName: "Total Sem", width: 150 },
     { field: "tsubname", headerName: "Total Subject", width: 150 },
     {
       field: "delete",
