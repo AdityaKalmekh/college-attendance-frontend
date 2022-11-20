@@ -8,6 +8,7 @@ import newLogo from "../assets/images/newLogo.png";
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import DomainIcon from "@mui/icons-material/Domain";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import SchoolIcon from "@mui/icons-material/School";
 import {
   Box,
   Divider,
@@ -73,26 +74,27 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const DRAWER_ITEMS = [
-  // {
-  //   route: "/signup",
-  //   literal: "Signup",
-  //   Icon: SupervisedUserCircleIcon,
-  // },
   {
     route: "/users",
     literal: "Users",
     Icon: SupervisedUserCircleIcon,
   },
   {
-    route: "/student",
-    literal: "StudentDetails",
-    Icon: EmojiPeopleIcon,
-  },
-  {
     route: "/branch",
     literal: "Branch",
     Icon: DomainIcon,
   },
+  {
+    route: "/student",
+    literal: "StudentDetails",
+    Icon: SchoolIcon,
+  },
+  {
+    route: "/faculty",
+    literal: "Faculty",
+    Icon: EmojiPeopleIcon,
+  },
+
   {
     route: "/Attendance",
     literal: "AttendenceCollection",
@@ -163,7 +165,7 @@ const Header = () => {
                 <img
                   alt="sales-manager-icon"
                   src={newLogo}
-                  width="80"
+                  width="50"
                   height="50"
                 />
               </a>
