@@ -18,9 +18,18 @@ import { useRef } from "react";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/student";
+import { getFacultyBranch,getFacultySem,getFacultySubject } from "../../api/faculty";
+import { useState } from "react";
+import FormikController from "../../formik/FormikController";
 
 const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
+
   const formikRef = useRef();
+  const [branchName,setBranchName] = useState([]);
+  const [semArray,setSemArray] = useState([]);
+  const [bname,setbname] =  useState();
+  const [subjects,setSubjects] = useState([]);
+
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
@@ -39,6 +48,25 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
       }
     });
   };
+
+  const loadBranchName = () =>{
+    getFacultyBranch().then(setBranchName);
+  }
+  console.log(branchName);
+
+  React.useEffect(() =>{
+    loadBranchName();
+  },[])
+
+  const branchNameHandler = (e) => {
+    setbname(e.target.value);
+    getFacultySem(e.target.value).then(setSemArray);
+  }
+
+  const semesterHandler = (e) => {
+    getFacultySubject(bname,e.target.value).then(setSubjects);
+  }
+
   return (
     <>
       <Dialog fullWidth open={open} onClose={onCancel}>
@@ -70,52 +98,47 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
                 <Grid item container spacing={2}>
                   <Grid item xs={12} md={12}>
                     <Typography>Select Any Branch</Typography>
-                    <Select
+                    <FormikController
                       control="select"
                       type="text"
                       label="Branch"
-                      name="sbranch"
+                      // name="sbranch"
                       fullWidth
-                      value={formik.values.sbranch}
-                      onChange={formik.handleChange}
-                      error={
-                        formik.touched.sbranch && Boolean(formik.errors.sbranch)
-                      }
-                      helperText={
-                        formik.touched.sbranch && formik.errors.sbranch
-                      }
+                      options={branchName?.map((option) => ({
+                        value: option,
+                        label: option,
+                      }))}
+                      onChange={branchNameHandler}
+                    
                     />
                   </Grid>
                   <br />
                   <Grid item xs={12} md={12}>
-                    <Typography>Select Subject</Typography>
-                    <Select
+                    <Typography>Select Semester</Typography>
+                    <FormikController
+                      control="select"
                       type="text"
-                      name="ssubject"
                       fullWidth
-                      value={formik.values.ssubject}
-                      onChange={formik.handleChange}
-                      error={
-                        formik.touched.ssubject &&
-                        Boolean(formik.errors.ssubject)
-                      }
-                      helperText={
-                        formik.touched.ssubject && formik.errors.ssubject
-                      }
+                      options={semArray?.map((option) => ({
+                        value: option,
+                        label: option,
+                      }))}
+                      onChange={semesterHandler}
                     />
                   </Grid>
                 </Grid>
                 <br />
                 <Grid item xs={12}>
-                  <Typography>Select Any Semester</Typography>
-                  <Select
+                  <Typography>Select Subject</Typography>
+                  <FormikController
+                    control="select"
                     type="text"
                     name="ssem"
                     fullWidth
-                    value={formik.values.ssem}
-                    onChange={formik.handleChange}
-                    error={formik.touched.ssem && Boolean(formik.errors.ssem)}
-                    helperText={formik.touched.ssem && formik.errors.ssem}
+                    options={subjects?.map((option) => ({
+                      value: option,
+                      label: option,
+                    }))}
                   />
                 </Grid>
                 <br />
