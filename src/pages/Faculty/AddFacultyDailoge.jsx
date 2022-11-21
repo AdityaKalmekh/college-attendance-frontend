@@ -17,7 +17,7 @@ import * as React from "react";
 import { useRef } from "react";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
-import { createStudent, updateStudent } from "../../api/student";
+import { addFaculty } from "../../api/faculty";
 import { getFacultyBranch,getFacultySem,getFacultySubject } from "../../api/faculty";
 import { useState } from "react";
 import FormikController from "../../formik/FormikController";
@@ -34,13 +34,12 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
         if (currentRow.firebaseId) {
-          updateStudent({
-            ...values,
-          });
+          // updateStudent({
+          //   ...values,
+          // });
         } else {
-          createStudent({
+          addFaculty({
             ...values,
-            date: dayjs().format(),
           });
         }
         onCancel();

@@ -1,5 +1,13 @@
 import http from "../http-common";
 
+export const addFaculty = async (values) =>{
+    return http.post("/addFaculty",values)
+}
+
+export const getFaculty = async (values) =>{
+    
+}
+
 export const getFacultyBranch = async () =>{
     const dt = [];
     const branches = await http.get("/branch");
