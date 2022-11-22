@@ -49,7 +49,8 @@ export const userContainerImageBox = css`
 
 export const userContainerImage = css`
   border-radius: 0;
-  height: 500px;
+  height: 400px;
+  margin-top: 20%;
   position: absolute;
   top: 0;
   left: 0;

@@ -1,18 +1,8 @@
-import { Button } from "@mui/material";
-// import { getBranch } from "../../api/Branch";
-// import { DataGrid } from "@mui/x-data-grid";
-// import { css } from "@emotion/react";
-// import BranchDailog from "./AddBranchDailoge";
+import { Button, DialogTitle, Grid, Select, Typography } from "@mui/material";
 import { useState } from "react";
-// import { GridActionsCellItem } from "@mui/x-data-grid";
-// import EditIcon from "@mui/icons-material/Edit";
-// import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-// import { deletestuentData } from "../../api/student";
-// import { deletebranchData } from "../../api/Branch";
-import AttendenceDailog from "./AddAttendanceDailoge";
+import DialogForAttendance from "./DilogForAttendance";
 const AttendenceCollection = () => {
   const [open, setOpen] = useState(false);
-  // const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
@@ -20,14 +10,6 @@ const AttendenceCollection = () => {
     tsem: "",
     tsubname: "",
   };
-
-  // const loadData = () => {
-  //   getBranch().then(setBranchCollection);
-  // };
-
-  // useEffect(() => {
-  //   loadData();
-  // }, []);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -38,27 +20,73 @@ const AttendenceCollection = () => {
     setOpen(false);
   };
 
-  // const handleDeleteClick = (row) => (event) => {
-  //   event.stopPropagation();
-  //   if (window.confirm("Are you sure to delete?") === true) {
-  //     deletebranchData(row);
-  //     loadData();
-  //   }
-  // };
-  // const handleEditClick = (row) => (event) => {
-  //   event.stopPropagation();
-  //   setCurrentRow({
-  //     bname: row.bname ? row.bname : "",
-  //     tsem: row.tsem ? row.tsem : "",
-  //     tsubname: row.tsubname ? row.t.sub : [""],
-  //   });
-  //   setOpen(true);
-  // };
-
   return (
     <>
+      <Grid container md={12} xs={12}>
+        <DialogTitle style={{ paddingBottom: "0px" }}>
+          Fill a Details
+        </DialogTitle>
+        <Grid
+          item
+          container
+          display="flex"
+          flexDirection="row"
+          spacing={2}
+          padding="1rem"
+          paddingTop=""
+        >
+          <Grid item md={4}>
+            <Typography>Select Any Branch</Typography>
+            <Select
+              control="select"
+              type="text"
+              label="Branch"
+              fullWidth
+              name="sbranch"
+              // value={}
+              // onChange={formik.handleChange}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <Typography>Select Faculty</Typography>
+            <Select
+              control="select"
+              type="text"
+              label="Branch"
+              fullWidth
+              name="sbranch"
+              // value={}
+              // onChange={formik.handleChange}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <Typography>Select Subject</Typography>
+            <Select
+              control="select"
+              type="text"
+              label="Branch"
+              fullWidth
+              name="sbranch"
+              // value={}
+              // onChange={formik.handleChange}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <Typography>Select Samester</Typography>
+            <Select
+              control="select"
+              type="text"
+              label="Branch"
+              fullWidth
+              name="sbranch"
+              // value={}
+              // onChange={formik.handleChange}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
       {open && (
-        <AttendenceDailog
+        <DialogForAttendance
           open={open}
           handleClickClose={handleClickClose}
           // loadData={loadData}
@@ -70,7 +98,7 @@ const AttendenceCollection = () => {
         variant="contained"
         sx={{ margin: "10px" }}
       >
-        Add
+        Take a Attendance
       </Button>
     </>
   );

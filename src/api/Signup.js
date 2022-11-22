@@ -6,11 +6,12 @@ import {
   getDocs,
   setDoc,
 } from "firebase/firestore";
-import { firestore } from "../firebase";
+import { firestore, fireAuth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export const getUserSignup = async () => {
   const data = [];
-  const querySnapshot = await getDocs(collection(firestore, "signup"));
+  const querySnapshot = await getDocs(collection(firestore, "user"));
   querySnapshot.forEach((document) => {
     data.push({ ...document.data(), firebaseId: document.id });
   });
@@ -19,7 +20,23 @@ export const getUserSignup = async () => {
 
 export const createUserSignup = async (values) => {
   try {
-    await addDoc(collection(firestore, "signup"), values);
+    console.log({ values });
+    const response = await addDoc(collection(firestore, "user"), values);
+    console.log({ signUPresponse: response });
+
+    // const signup = document.querySelector(".signup");
+    // signup.addEventListener("submit", (e) => {
+    //   e.preventDefault();
+
+    createUserWithEmailAndPassword(fireAuth, values.email, values.password)
+      .then((res) => {
+        console.log(res);
+        // signup.reset();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // });
   } catch (err) {
     console.log({ err });
   }
