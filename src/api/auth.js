@@ -13,6 +13,9 @@ export const login = () => {
 
 export const loginWithEmailAndPassword = async (values) => {
   const { email, password } = values;
-  return signInWithEmailAndPassword(fireAuth, email, password);
+  console.log({ email, password });
+  const signUpRes = signInWithEmailAndPassword(fireAuth, email, password);
+  console.log({ signUpRes });
+  return signUpRes;
 };
 export const logout = async () => fireAuth.signOut();

@@ -43,7 +43,6 @@ const LoginForm = () => {
                     <Box sx={userContainerImageBox}>
                       <Avatar
                         sx={userContainerImage}
-                        height="500px"
                         alt="sales-manager-icon"
                         src={SalesManager}
                       />

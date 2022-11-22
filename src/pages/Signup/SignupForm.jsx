@@ -94,7 +94,7 @@ const SignupForm = () => {
             <FormikController
               control="input"
               type="password"
-              label="Confierm Password"
+              label="Confirm Password"
               name="confirmpassword"
               fullWidth
               value={formik.values.confirmpassword}
