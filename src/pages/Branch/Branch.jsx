@@ -14,29 +14,29 @@ const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  const [branchArray, setBranchArray] = useState([]);
+  // const [branchArray, setBranchArray] = useState([]);
 
   const initialValues = {
-    bname: "",
-    tsem: "",
-    tsubname: "",
+    branchname: "",
+    totalsem: "",
+    semesters: "",
   };
-  console.log({ branchArray });
+  // console.log({ branchArray });
 
-  const displayData = (item) => {
-    const bname = item?.branch_name;
-    const totalsem = item?.semesters.length;
-    let totalsub = 0;
-    item?.semesters.forEach(function (item2) {
-      totalsub += item2?.subject.length;
-    });
-    setBranchArray((prev) => {
-      return [
-        ...prev,
-        { branch_name: bname, semesters: totalsem, subject: totalsub },
-      ];
-    });
-  };
+  // const displayData = (item) => {
+  //   const bname = item?.branch_name;
+  //   const totalsem = item?.semesters.length;
+  //   let totalsub = 0;
+  //   item?.semesters.forEach(function (item2) {
+  //     totalsub += item2?.subject.length;
+  //   });
+  //   setBranchArray((prev) => {
+  //     return [
+  //       ...prev,
+  //       { branch_name: bname, semesters: totalsem, subject: totalsub },
+  //     ];
+  //   });
+  // };
 
   const loadData = () => {
     getBranch().then(setBranchCollection);
@@ -44,7 +44,7 @@ const BranchCollection = () => {
 
   useEffect(() => {
     loadData();
-    displayData();
+    // displayData();
   }, []);
 
   const handleClickOpen = () => {
@@ -67,18 +67,19 @@ const BranchCollection = () => {
     console.log(row);
     event.stopPropagation();
     setCurrentRow({
-      branch_name: row.branch_name ? row.branch_name : "",
-      semesters: row.semesters ? row.semesters : "",
+      branchname: row.branchname ? row.branchname : "",
+      totalsem: row.totalsem ? row.totalsem : "",
       subject: row.subject ? row.subject : "",
+      firebaseId: row.firebaseId,
     });
     setOpen(true);
   };
 
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
-    { field: "branch_name", headerName: "Branch Name", width: 150 },
-    { field: "semesters", headerName: "Total Sem", width: 150 },
-    { field: "tsubname", headerName: "Total Subject", width: 150 },
+    { field: "branchname", headerName: "Branch Name", width: 150 },
+    { field: "totalsem", headerName: "Total Sem", width: 150 },
+    // { field: "tsubname", headerName: "Total Subject", width: 150 },
     {
       field: "delete",
       headerName: "Delete",
@@ -110,7 +111,7 @@ const BranchCollection = () => {
       ),
     },
   ];
-
+  console.log({ branchCollection });
   return (
     <>
       {open && (
