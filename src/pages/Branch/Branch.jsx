@@ -14,43 +14,38 @@ const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  const [branchArray,setBranchArray] = useState([]);
+  const [branchArray, setBranchArray] = useState([]);
 
   const initialValues = {
     bname: "",
     tsem: "",
     tsubname: "",
   };
+  console.log({ branchArray });
 
-
-  const displayData= () =>{
-    branchCollection.forEach(function (item){
-      const bname = item.branch_name;
-      const totalsem = item.semesters.length
-      let totalsub = 0;
-      item.semesters.forEach(function (item2){
-        totalsub += item2.subject.length
-      })
-      setBranchArray(prev =>{
-        return [...prev,{"branch_name":bname,"semesters":totalsem,"subject":totalsub}]
-      });
-    })
-  }
+  const displayData = (item) => {
+    const bname = item?.branch_name;
+    const totalsem = item?.semesters.length;
+    let totalsub = 0;
+    item?.semesters.forEach(function (item2) {
+      totalsub += item2?.subject.length;
+    });
+    setBranchArray((prev) => {
+      return [
+        ...prev,
+        { branch_name: bname, semesters: totalsem, subject: totalsub },
+      ];
+    });
+  };
 
   const loadData = () => {
     getBranch().then(setBranchCollection);
-    displayData();
   };
-  
-  // useEffect(() =>{
-  //   displayData()
-  // },[setBranchCollection])
-  
-  // console.log(branchCollection);
+
   useEffect(() => {
     loadData();
-    // displayData();
-  },[]);
+    displayData();
+  }, []);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -79,11 +74,8 @@ const BranchCollection = () => {
     setOpen(true);
   };
 
-  
-
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
-    { field: "firebaseId", headerName: "ID", width: 200 },
     { field: "branch_name", headerName: "Branch Name", width: 150 },
     { field: "semesters", headerName: "Total Sem", width: 150 },
     { field: "tsubname", headerName: "Total Subject", width: 150 },

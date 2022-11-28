@@ -12,9 +12,9 @@ import http from "../http-common";
 export const getBranch = async () => {
   const data = [];
   const branchData = await http.get("/getBranch");
-  branchData.data.branches.map((branch) =>{
+  branchData.data.branches.map((branch) => {
     return data.push(branch);
-  })
+  });
   // const querySnapshot = await getDocs(collection(firestore, "branch"));
   // querySnapshot.forEach((document) => {
   //   data.push({ ...document.data(), firebaseId: document.id });
@@ -23,7 +23,7 @@ export const getBranch = async () => {
 };
 
 export const createBranch = async (values) => {
-  return http.post("/addBranch",values);
+  return http.post("/addBranch", values);
   // try {
   //   await addDoc(collection(firestore, "branch"), values);
   // } catch (err) {
