@@ -9,39 +9,39 @@ import {
 import { firestore } from "../firebase";
 // import http from "../http-common";
 
-export const getFaculty = async () => {
+export const getAllocation = async () => {
   const data = [];
   // const branchData = await http.get("/getBranch");
   // branchData.data.branches.map((branch) => {
   //   return data.push(branch);
   // });
-  const querySnapshot = await getDocs(collection(firestore, "faculty"));
+  const querySnapshot = await getDocs(collection(firestore, "allocation"));
   querySnapshot.forEach((document) => {
     data.push({ ...document.data(), firebaseId: document.id });
   });
   return data;
 };
 
-export const createFaculty = async (values) => {
+export const createAllocation = async (values) => {
   // return http.post("/addBranch", values);
   try {
-    await addDoc(collection(firestore, "faculty"), values);
+    await addDoc(collection(firestore, "allocation"), values);
   } catch (err) {
     console.log({ err });
   }
 };
 
-export const updateFaculty = async (values) => {
+export const updateAllocation = async (values) => {
   try {
-    await setDoc(doc(firestore, "faculty", values.firebaseId), values);
+    await setDoc(doc(firestore, "allocation", values.firebaseId), values);
   } catch (err) {
     console.log({ err });
   }
 };
 
-export const deletefacultyData = async (values) => {
+export const deleteallocationData = async (values) => {
   try {
-    await deleteDoc(doc(firestore, "faculty", values.firebaseId));
+    await deleteDoc(doc(firestore, "allocation", values.firebaseId));
   } catch (err) {
     console.log({ err });
   }
