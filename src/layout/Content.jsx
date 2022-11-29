@@ -4,6 +4,7 @@ import StudentCollection from "../pages/students/Student";
 import BranchCollection from "../pages/Branch/Branch";
 import AttendenceCollection from "../pages/Attendance/AttendenceIndex";
 import FacultyCollection from "../pages/Faculty/Faculty";
+import AllocationCollection from "../pages/Allocation/Allocation";
 
 const Content = () => {
   return (
@@ -15,6 +16,7 @@ const Content = () => {
       <Route exact path="/branch" element={<BranchCollection />} />
       <Route exact path="/attendance" element={<AttendenceCollection />} />
       <Route exact path="/faculty" element={<FacultyCollection />} />
+      <Route exact path="/allocation" element={<AllocationCollection />} />
     </Routes>
   );
 };

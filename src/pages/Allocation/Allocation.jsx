@@ -1,15 +1,16 @@
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
-import { getFaculty, deletefacultyData } from "../../api/faculty";
-import FacultyDialog from "./AddFacultyDailoge";
+// import { getFaculty, deletefacultyData } from "../../api/faculty";
+import { getAllocation, deleteallocationData } from "../../api/allocation";
+import AllocationDialog from "./AddAllocationDialog";
 import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from "react-toastify";
 
-const FacultyCollection = () => {
+const AllocationCollection = () => {
   const [open, setOpen] = useState(false);
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
@@ -22,7 +23,7 @@ const FacultyCollection = () => {
   };
 
   const loadData = () => {
-    getFaculty().then(setFacultyCollection);
+    getAllocation().then(setFacultyCollection);
   };
 
   useEffect(() => {
@@ -42,10 +43,10 @@ const FacultyCollection = () => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
       console.log(row);
-      deletefacultyData(row);
+      deleteallocationData(row);
       loadData();
     }
-    toast.warning("Faculty Delete Sucessfully");
+    toast.warning("Allocated Faculty Delete Sucessfully");
   };
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
@@ -100,7 +101,7 @@ const FacultyCollection = () => {
   return (
     <>
       {open && (
-        <FacultyDialog
+        <AllocationDialog
           open={open}
           onCancel={handleClickClose}
           loadData={loadData}
@@ -112,7 +113,7 @@ const FacultyCollection = () => {
         variant="contained"
         sx={{ margin: "10px" }}
       >
-        Add Faculty
+        Faculty Allocate
       </Button>
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
@@ -132,4 +133,4 @@ const FacultyCollection = () => {
   );
 };
 
-export default FacultyCollection;
+export default AllocationCollection;

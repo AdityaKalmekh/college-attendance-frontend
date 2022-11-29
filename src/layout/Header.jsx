@@ -9,6 +9,7 @@ import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import DomainIcon from "@mui/icons-material/Domain";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import SchoolIcon from "@mui/icons-material/School";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import {
   Box,
   Divider,
@@ -23,9 +24,7 @@ import {
 import MuiAppBar from "@mui/material/AppBar";
 import MuiDrawer from "@mui/material/Drawer";
 import { styled } from "@mui/material/styles";
-// import { useState } from "react";
 import { Link } from "react-router-dom";
-// import Notifications from "src/components/notifications/Notifications";
 import { drawerWidth } from "../../src/constants/styleConstants";
 import { useAuthContext, useLayoutContext } from "../context";
 
@@ -93,6 +92,12 @@ const DRAWER_ITEMS = [
     route: "/faculty",
     literal: "Faculty",
     Icon: EmojiPeopleIcon,
+  },
+
+  {
+    route: "/allocation",
+    literal: "Faculty Allocation",
+    Icon: AssignmentIndIcon,
   },
 
   {
