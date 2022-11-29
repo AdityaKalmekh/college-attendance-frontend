@@ -1,13 +1,15 @@
-import { Grid, Button, Typography, TextField } from "@mui/material";
+import { Grid, Button, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import Modal from "../../common/Modal";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import useProgress from "../../hooks/useProgress";
 import { Form, Formik } from "formik";
 import Loading from "../../common/Loader";
 import FormikController from "../../formik/FormikController";
 import { createBranch, updateBranch } from "../../api/Branch";
+import AddMultipalSubjet from "./AddMultipalSubject";
+import { getSubject } from "../../api/Subject";
 
 const BranchDailog = ({
   handleClickClose,
@@ -17,82 +19,54 @@ const BranchDailog = ({
   currentRow,
 }) => {
   const formikRef = useRef();
-  const input = useRef();
-  const [createNewBranch, createLoading] = useProgress(createBranch);
-  const [updateExistingBranch, updateLoading] = useProgress(updateBranch);
-  const [totalSemvalues, setTotalSemValues] = useState([]);
+  const [createNewInvoice, createLoading] = useProgress(createBranch);
+  const [updateExistingInvioce, updateLoading] = useProgress(updateBranch);
+  const [fieldvalues, setFieldValues] = useState([]);
   const [branch, setbranch] = useState();
   const [currentsem, setcurrentsem] = useState();
-  const [semesters, setSemesters] = useState([]);
-  const [counter, setCounter] = useState([]);
-  const [container, setcontainer] = useState([]);
-  const [totalsem, setTotalsem] = useState();
+  const [openForSub, setOpenForSub] = useState(false);
+  const [showSubject, setshowSubject] = useState();
+  const names = showSubject?.map((item) => item.container);
+  console.log(names);
+  const loadDataForSubject = () => {
+    getSubject().then(setshowSubject);
+  };
+
+  useEffect(() => {
+    loadDataForSubject();
+  }, []);
+
+  const handleClickOpenForSub = () => {
+    // setCurrentRow(initialValues);
+    setOpenForSub(true);
+  };
+
+  const handleClickCloseForSub = () => {
+    setOpenForSub(false);
+  };
 
   const onOk = () => {
     const branchContainer = {
-      branchname: branch,
-      totalsem: totalsem,
-      semesters: semesters,
-      totalSemvalues: totalSemvalues,
+      branch_name: branch,
+      // semesters: semesters,
     };
-    console.log({ branchContainer });
     if (branchContainer) {
-      if (currentRow.firebaseId) {
-        updateExistingBranch(branchContainer).then(() => {
-          toast.success("Branch created successfully");
-          handleClickClose();
-        });
-      } else {
-        createNewBranch(branchContainer).then(() => {
-          toast.success("Branch created successfully");
-          handleClickClose();
-        });
-      }
-    }
-  };
-  const handleFinalSubmit = () => {
-    setSemesters((prev) => {
-      return [
-        ...prev,
-        {
-          branchname: branch,
-          sem_name: currentsem,
-          subject: container,
-        },
-      ];
-    });
-    setcontainer([]);
-  };
-  console.log({ semesters });
-
-  const handleClick = () => {
-    if (counter.length === 0) {
-      console.log("s2");
-      const d = [];
-      d.push(0);
-      setCounter(d);
-    } else {
-      const d = counter.length + 1;
-      setCounter([...counter, d]);
+      createNewInvoice(branchContainer).then(() => {
+        toast.success("Branch created successfully");
+        handleClickClose();
+      });
     }
   };
 
-  const addSubject = (index) => (e) => {
-    const containerCopy = [...container];
-    containerCopy[index] = e.target.value;
-    setcontainer(containerCopy);
-  };
-
-  const handleTotalSem = (e) => {
-    setTotalsem(e.target.value);
+  const handleOnChange = (e) => {
     let arr = [];
     for (let i = 1; i <= e.target.value; i++) {
       arr.push(i);
     }
-    setTotalSemValues(arr);
+    setFieldValues(arr);
   };
 
-  const handleSelectedSem = (e) => {
+  const semhandler = (e) => {
     setcurrentsem(e.target.value);
   };
 
@@ -101,30 +75,10 @@ const BranchDailog = ({
     setbranch(currentb);
   };
 
-  const handleShowandClear = () => {
-    let clr = [...counter];
-    input.current.reset();
-    clr.forEach((d, i) => {
-      // eslint-disable-next-line eqeqeq
-      if (d == -111) {
-      } else {
-        clr[i] = -111;
-      }
-    });
-    setCounter(clr);
-  };
-
-  const deletedInput2 = (index) => {
-    const d = [...counter];
-    d[index] = -111;
-    console.log({ deleted: d });
-    setCounter(d);
-  };
   return (
     <Modal
       title={currentRow._id ? "Update Branch" : "Create Branch"}
       onOk={onOk}
-      fullScreen
       onCancel={handleClickClose}
       sx={{ minHeight: (createLoading || updateLoading) && "200px" }}
     >
@@ -153,16 +107,13 @@ const BranchDailog = ({
                   padding=".5rem"
                   margin="1rem"
                 >
-                  <Grid item container xs={12} md={5}>
-                    <Typography>
-                      <b>Fill Branch Details</b>
-                    </Typography>
+                  <Grid item container xs={12} md={6}>
                     <Grid item xs={12} md={12} textAlign="left">
                       <FormikController
                         control="input"
                         type="text"
                         label="Branch Name"
-                        // name="bname"
+                        name="bname"
                         fullWidth
                         value={branch}
                         onChange={branchHandler}
@@ -173,9 +124,9 @@ const BranchDailog = ({
                         control="input"
                         type="number"
                         label="Total Sem"
-                        // name="tsem"
+                        name="tsem"
                         fullWidth
-                        onChange={handleTotalSem}
+                        onChange={handleOnChange}
                       />
                     </Grid>
                     <Grid item xs={12} textAlign="left" paddingTop="1rem">
@@ -183,112 +134,50 @@ const BranchDailog = ({
                         control="select"
                         type="nember"
                         label="Select Sem For Subject"
+                        name="semfsub"
                         fullWidth
-                        options={totalSemvalues?.map((option) => ({
+                        options={fieldvalues?.map((option) => ({
                           value: option,
                           label: option,
                         }))}
-                        onChange={handleSelectedSem}
+                        onChange={semhandler}
                       />
+                    </Grid>
+                    <br />
+                    <Grid paddingTop="1rem">
+                      {openForSub && (
+                        <AddMultipalSubjet
+                          open={openForSub}
+                          handleClickClose={handleClickCloseForSub}
+                          loadData={loadData}
+                          currentRow={currentRow}
+                          currentsem={currentsem}
+                        />
+                      )}
+                      <Button
+                        onClick={handleClickOpenForSub}
+                        variant="contained"
+                        sx={{ margin: "10px" }}
+                      >
+                        + Add Subject
+                      </Button>
                     </Grid>
                   </Grid>
                   <Grid
-                    item
-                    md={0.5}
-                    borderRight="3px solid black"
-                    marginRight="1.5rem"
+                    borderLeft="3px solid black"
+                    marginLeft="1rem"
+                    marginRight="1rem"
                   ></Grid>
-                  <Grid
-                    item
-                    container
-                    xs={12}
-                    md={6}
-                    display="flex"
-                    flexDirection="column"
-                  >
-                    <Typography>
-                      <b>Add Subject For Semester:</b> {currentsem}
-                    </Typography>
-                    <form ref={input}>
-                      <Grid item md={6}>
-                        {/* {Array.from(Array(counter)).map((c, index) => { */}
-                        {counter.length > 0
-                          ? counter?.map((c, index) => {
-                              if (c === -111) {
-                                return null;
-                              }
-                              return (
-                                <div>
-                                  <TextField
-                                    // id={`id${index}`}
-                                    // ref={input}
-
-                                    fullWidth
-                                    sx={{
-                                      marginTop: "1rem",
-                                      marginLeft: ".5rem",
-                                    }}
-                                    key={c}
-                                    className={index}
-                                    type="text"
-                                    onChange={addSubject(index)}
-                                  />
-                                  <Button
-                                    sx={{ margin: "1rem" }}
-                                    size="small"
-                                    variant="contained"
-                                    onClick={() => {
-                                      deletedInput2(index);
-                                    }}
-                                  >
-                                    delete
-                                  </Button>
-                                </div>
-                              );
-                            })
-                          : null}
-                      </Grid>
-                    </form>
-
-                    <Grid item sx={{ paddingTop: ".5rem" }}>
-                      <Button variant="contained" onClick={handleClick}>
-                        +
-                      </Button>
-                      <Button
-                        sx={{ marginLeft: "1rem" }}
-                        variant="contained"
-                        onClick={handleShowandClear}
-                      >
-                        Reset Subject Field
-                      </Button>
-                      <Button
-                        sx={{ marginLeft: "1rem" }}
-                        variant="contained"
-                        onClick={handleFinalSubmit}
-                      >
-                        Add Subject
-                      </Button>
-                    </Grid>
+                  <Grid>
+                    <Typography>Data</Typography>
+                    {/* {names?.map((data, index) => {
+                      return <Typography>{(...data, index)}</Typography>;
+                    })} */}
                   </Grid>
                 </Grid>
               </Form>
             )}
           </Formik>
-          <Grid margin="1rem" borderTop="3px solid black"></Grid>
-          <Grid
-            container
-            display="flex"
-            padding=".5rem"
-            margin="1rem"
-            flexDirection="column"
-          >
-            <Typography>
-              <h3>Field Semester {currentsem} subjects:</h3>
-            </Typography>
-            {container?.map((d) => {
-              return <Typography>{d}</Typography>;
-            })}
-          </Grid>
         </Grid>
       )}
     </Modal>
