@@ -8,25 +8,12 @@ import {
   Grid,
 } from "@material-ui/core";
 import * as React from "react";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Form, Formik } from "formik";
-import FormikController from "../../formik/FormikController";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/student";
-import { getBranch } from "../../api/Branch";
-import { useState } from "react";
 
 const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
-  const [viewBranch, setViewBranch] = useState([]);
-  const [branchData, setBranchData] = useState();
-  console.log({ branchData });
-  const loadBranchData = () => {
-    getBranch().then(setViewBranch);
-  };
-
-  useEffect(() => {
-    loadBranchData();
-  }, []);
   const formikRef = useRef();
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
@@ -141,62 +128,49 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
                 </Grid>
                 <br />
                 <Grid item container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <FormikController
-                      sx={{ width: "16rem" }}
-                      variant="standard"
-                      control="select"
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      control="input"
                       type="text"
-                      label="Branch"
-                      name="branch"
+                      label="Course"
+                      name="course"
                       fullWidth
-                      options={viewBranch?.map((b) => ({
-                        value: b.branchname,
-                        label: b.branchname,
-                      }))}
-                      value={formik.values.branch}
-                      onChange={(e) => {
-                        const branchId = e.target.value;
-                        setBranchData(
-                          viewBranch?.find((b) => b.branchname === branchId)
-                        );
-
-                        formik.handleChange(e);
-                      }}
+                      value={formik.values.course}
+                      onChange={formik.handleChange}
                       error={
-                        formik.touched.branch && Boolean(formik.errors.branch)
+                        formik.touched.course && Boolean(formik.errors.course)
                       }
-                      helperText={formik.touched.branch && formik.errors.branch}
+                      helperText={formik.touched.course && formik.errors.course}
                     />
                   </Grid>
                   <br />
-                  <Grid item xs={12} md={6}>
-                    <FormikController
-                      sx={{ width: "16rem" }}
-                      variant="standard"
-                      control="select"
-                      type="nember"
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      control="input"
+                      type="number"
                       label="Semester"
                       name="sem"
                       fullWidth
-                      options={viewBranch?.map((b) => ({
-                        value: b.totalSemvalues,
-                        label: b.totalSemvalues,
-                      }))}
-                      value={formik.values.b}
-                      onChange={(e) => {
-                        const semId = e.target.value;
-                        setBranchData(
-                          viewBranch?.find((b) => b.totalSemvalues === semId)
-                        );
-
-                        formik.handleChange(e);
-                      }}
+                      value={formik.values.sem}
+                      onChange={formik.handleChange}
                       error={formik.touched.sem && Boolean(formik.errors.sem)}
                       helperText={formik.touched.sem && formik.errors.sem}
                     />
                   </Grid>
                   <br />
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      control="input"
+                      type="text"
+                      label="Division"
+                      name="div"
+                      fullWidth
+                      value={formik.values.div}
+                      onChange={formik.handleChange}
+                      error={formik.touched.div && Boolean(formik.errors.div)}
+                      helperText={formik.touched.div && formik.errors.div}
+                    />
+                  </Grid>
                 </Grid>
                 <br />
                 <Grid item container spacing={2}>
