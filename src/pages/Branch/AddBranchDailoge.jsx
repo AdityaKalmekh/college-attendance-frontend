@@ -8,7 +8,7 @@ import { Form, Formik } from "formik";
 import Loading from "../../common/Loader";
 import FormikController from "../../formik/FormikController";
 import { createBranch, updateBranch } from "../../api/Branch";
-import AddMultipalSubjet from "./AddMultipalSubject";
+// import AddMultipalSubjet from "./AddMultipalSubject";
 import { getSubject } from "../../api/Subject";
 
 const BranchDailog = ({
@@ -39,10 +39,6 @@ const BranchDailog = ({
   const handleClickOpenForSub = () => {
     // setCurrentRow(initialValues);
     setOpenForSub(true);
-  };
-
-  const handleClickCloseForSub = () => {
-    setOpenForSub(false);
   };
 
   const onOk = () => {
@@ -145,15 +141,6 @@ const BranchDailog = ({
                     </Grid>
                     <br />
                     <Grid paddingTop="1rem">
-                      {openForSub && (
-                        <AddMultipalSubjet
-                          open={openForSub}
-                          handleClickClose={handleClickCloseForSub}
-                          loadData={loadData}
-                          currentRow={currentRow}
-                          currentsem={currentsem}
-                        />
-                      )}
                       <Button
                         onClick={handleClickOpenForSub}
                         variant="contained"
