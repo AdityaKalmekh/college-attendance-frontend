@@ -7,7 +7,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { firestore } from "../firebase";
-// import http from "../http-common";
+import http from "../http-common";
 
 export const getAllocation = async () => {
   const data = [];
@@ -23,12 +23,13 @@ export const getAllocation = async () => {
 };
 
 export const createAllocation = async (values) => {
-  // return http.post("/addBranch", values);
-  try {
-    await addDoc(collection(firestore, "allocation"), values);
-  } catch (err) {
-    console.log({ err });
-  }
+  
+  return http.post("/addAllocation", values);
+  // try {
+  //   await addDoc(collection(firestore, "allocation"), values);
+  // } catch (err) {
+  //   console.log({ err });
+  // }
 };
 
 export const updateAllocation = async (values) => {

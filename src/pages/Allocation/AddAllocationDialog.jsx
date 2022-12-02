@@ -14,12 +14,14 @@ import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
 import { createAllocation, updateAllocation } from "../../api/allocation";
 import { getFaculty } from "../../api/faculty";
-import { getBranch } from "../../api/Branch";
+import { getbranchName,getSem,getSubject,getId } from "../../api/Branch";
 import { useState, useEffect } from "react";
 
 const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [branchCollection, setBranchCollection] = useState([]);
+  const [semCollection, setSemCollection] = useState([]);
+  const [subjectCollection, setSubjectCollection] = useState([]);
   const [allocatedFacuty, setAllocatedFacuty] = useState();
   const [allocatedbranch, setallocatedbranch] = useState();
   const [allocatedSemester, setAllocatedSemester] = useState();
@@ -35,7 +37,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
   }, []);
 
   const loadDataForBranch = () => {
-    getBranch().then(setBranchCollection);
+    getbranchName().then(setBranchCollection);
   };
 
   useEffect(() => {
@@ -44,19 +46,42 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
 
   const formikRef = useRef();
 
+  const branchHandler = (e) => {
+    setallocatedbranch(e.target.value);
+    getSem(e.target.value).then(setSemCollection);
+  }
+
+  const semHandler = (e) => {
+    setAllocatedSemester(e.target.value);
+    getSubject(e.target.value).then(setSubjectCollection);
+  }
+
+  const facultyHandler = (e) => {
+    setAllocatedFacuty(e.target.value);
+    getId(e.target.value);
+  }
+
+  console.log({allocatedFacuty});
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
-        if (currentRow.firebaseId) {
-          createAllocation({
+        console.log(values);
+        if (currentRow.id) {
+          updateAllocation({  
             ...values,
-            allocatedFacuty,
+            facultyName : allocatedFacuty,
+            branch : allocatedbranch,
+            semester : allocatedSemester,
+            subject : allocatedSubject            
           });
           toast.success("Faculty Allocation updated successfully");
         } else {
-          updateAllocation({
+          createAllocation({
             ...values,
-            allocatedFacuty,
+            facultyName : allocatedFacuty,
+            branch : allocatedbranch,
+            semester : allocatedSemester,
+            subject : allocatedSubject
           });
           toast.success("Faculty Allocation created successfully");
         }
@@ -84,7 +109,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                   <FormikController
                     control="select"
                     type="text"
-                    label="Product*"
+                    label="Faculty"
                     name="product"
                     fullWidth
                     options={facultyCollection.map((f) => {
@@ -94,16 +119,16 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                       };
                     })}
                     value={formik.values.product}
-                    onChange={(e) => {
-                      const productId = e.target.value;
-                      setAllocatedFacuty(
-                        facultyCollection.find(
-                          (product) => product.product === productId
-                        )
-                      );
-
-                      formik.handleChange(e);
-                    }}
+                    // onChange={(e) => {
+                    //   const productId = e.target.value;
+                    //   setAllocatedFacuty(
+                    //     facultyCollection.find(
+                    //       (product) => product.product === productId
+                    //     )
+                    //   );
+                    //   formik.handleChange(e);
+                    // }}
+                    onChange = {facultyHandler}
                     error={
                       formik.touched.product && Boolean(formik.errors.product)
                     }
@@ -116,26 +141,27 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <FormikController
                       control="select"
                       type="text"
-                      label="Product*"
+                      label="Branch"
                       name="product"
                       fullWidth
-                      options={facultyCollection.map((product) => {
+                      options={branchCollection.map((product) => {
                         return {
-                          value: product.product,
-                          label: product.product,
+                          value: product,
+                          label: product,
                         };
                       })}
                       value={formik.values.product}
-                      onChange={(e) => {
-                        const productId = e.target.value;
-                        setallocatedbranch(
-                          facultyCollection.find(
-                            (product) => product.product === productId
-                          )
-                        );
+                      // onChange={(e) => {
+                      //   const productId = e.target.value;
+                      //   setallocatedbranch(
+                      //     facultyCollection.find(
+                      //       (product) => product.product === productId
+                      //     )
+                      //   );
 
-                        formik.handleChange(e);
-                      }}
+                      //   formik.handleChange(e);
+                      // }}
+                      onChange = {branchHandler}
                       error={
                         formik.touched.product && Boolean(formik.errors.product)
                       }
@@ -149,26 +175,27 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <FormikController
                       control="select"
                       type="text"
-                      label="Product*"
+                      label="Semester"
                       name="product"
                       fullWidth
-                      options={facultyCollection.map((product) => {
+                      options={semCollection.map((product) => {
                         return {
-                          value: product.product,
-                          label: product.product,
+                          value: product,
+                          label: product,
                         };
                       })}
                       value={formik.values.product}
-                      onChange={(e) => {
-                        const productId = e.target.value;
-                        setAllocatedSemester(
-                          facultyCollection.find(
-                            (product) => product.product === productId
-                          )
-                        );
+                      // onChange={(e) => {
+                      //   const productId = e.target.value;
+                      //   setAllocatedSemester(
+                      //     facultyCollection.find(
+                      //       (product) => product.product === productId
+                      //     )
+                      //   );
 
-                        formik.handleChange(e);
-                      }}
+                      //   formik.handleChange(e);
+                      // }}
+                      onChange = {semHandler}
                       error={
                         formik.touched.product && Boolean(formik.errors.product)
                       }
@@ -182,13 +209,13 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <FormikController
                       control="select"
                       type="text"
-                      label="Product*"
+                      label="Subject"
                       name="product"
                       fullWidth
-                      options={facultyCollection.map((product) => {
+                      options={semCollection.map((product) => {
                         return {
-                          value: product.product,
-                          label: product.product,
+                          value: product,
+                          label: product,
                         };
                       })}
                       value={formik.values.product}

@@ -18,6 +18,7 @@ const StudentCollection = () => {
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
+    _id : "",
     fname: "",
     mname: "",
     sname: "",
@@ -33,6 +34,7 @@ const StudentCollection = () => {
   const loadData = () => {
     getStudent().then(setStudentCollection);
   };
+  console.log(studentCollection);
 
   useEffect(() => {
     loadData();
@@ -66,6 +68,7 @@ const StudentCollection = () => {
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
     setCurrentRow({
+      id : row._id ? row._id : "",
       fname: row.fname ? row.fname : "",
       mname: row.mname ? row.mname : "",
       sname: row.sname ? row.sname : "",

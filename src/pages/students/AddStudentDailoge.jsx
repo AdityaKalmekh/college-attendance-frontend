@@ -13,15 +13,17 @@ import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/student";
-import { getBranch } from "../../api/Branch";
+import { getbranchName, getSem } from "../../api/Branch";
 import { useState } from "react";
 
 const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
   const [viewBranch, setViewBranch] = useState([]);
+  const [viewSem,setSem] = useState([]);
   const [branchData, setBranchData] = useState();
-  console.log({ branchData });
+  const [branch, setBranch] = useState();
+  console.log({addi: branch});
   const loadBranchData = () => {
-    getBranch().then(setViewBranch);
+    getbranchName().then(setViewBranch);
   };
 
   useEffect(() => {
@@ -30,22 +32,35 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
   const formikRef = useRef();
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
+      console.log(currentRow);
       if (values) {
-        if (currentRow.firebaseId) {
+        if (currentRow.id) {
+          console.log("hi");
           updateStudent({
             ...values,
+            course: branchData,
           });
         } else {
           createStudent({
             ...values,
-            date: dayjs().format(),
+            course: branch,
           });
         }
+        console.log({values})
         onCancel();
         loadData();
       }
     });
   };
+
+  const branchHandler = (event) => {
+    setBranch(event.target.value);
+    setBranchData(event.target.value);
+    getSem(event.target.value).then(setSem);
+    
+  }
+  console.log({branch});
+  // console.log(viewBranch);
   return (
     <>
       <Dialog fullWidth open={open} onClose={onCancel}>
@@ -151,18 +166,19 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
                       name="branch"
                       fullWidth
                       options={viewBranch?.map((b) => ({
-                        value: b.branchname,
-                        label: b.branchname,
+                        value: b,
+                        label: b,
                       }))}
-                      value={formik.values.branch}
-                      onChange={(e) => {
-                        const branchId = e.target.value;
-                        setBranchData(
-                          viewBranch?.find((b) => b.branchname === branchId)
-                        );
+                      value={formik.values.course}
+                      // onChange={(e) => {
+                      //   const branchId = e.target.value;
+                      //   setBranchData(
+                      //     viewBranch?.find((b) => b.branchname === branchId)
+                      //   );
 
-                        formik.handleChange(e);
-                      }}
+                      //   formik.handleChange(e);
+                      // }}
+                      onChange = {branchHandler}
                       error={
                         formik.touched.branch && Boolean(formik.errors.branch)
                       }
@@ -179,11 +195,11 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
                       label="Semester"
                       name="sem"
                       fullWidth
-                      options={viewBranch?.map((b) => ({
-                        value: b.totalSemvalues,
-                        label: b.totalSemvalues,
+                      options={viewSem?.map((b) => ({
+                        value: b,
+                        label: b,
                       }))}
-                      value={formik.values.b}
+                      value={formik.values.sem}
                       onChange={(e) => {
                         const semId = e.target.value;
                         setBranchData(

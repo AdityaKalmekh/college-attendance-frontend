@@ -16,10 +16,12 @@ const AllocationCollection = () => {
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
-    fname: "",
-    qulification: "",
-    expirience: "",
-    expertise: "",
+    id : "",
+    facultyName: "",
+    branch: "",
+    semester: "",
+    subject: "",
+
   };
 
   const loadData = () => {
@@ -51,21 +53,21 @@ const AllocationCollection = () => {
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
     setCurrentRow({
-      fname: row.fname ? row.fname : "",
-      qulification: row.qulification ? row.qulification : "",
-      expirience: row.expirience ? row.expirience : "",
-      expertise: row.expertise ? row.expertise : "",
-      firebaseid: row.firebaseid,
+      id: row._id ? row._id : "",
+      facultyName: row.facultyName ? row.facultyName : "",
+      branch : row.branch ? row.branch : "",
+      semester : row.semester ? row.semester : "",
+      subject : row.subject ? row.subject : "",  
     });
     setOpen(true);
   };
 
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
-    { field: "fname", headerName: "Facuty Name", width: 200 },
-    { field: "qulification", headerName: "Qulification ", width: 200 },
-    { field: "expirience", headerName: "Expirience ", width: 200 },
-    { field: "expertise", headerName: "Expertise ", width: 200 },
+    { field: "facultyName", headerName: "Facuty Name", width: 200 },
+    { field: "branch", headerName: "Qulification ", width: 200 },
+    { field: "semester", headerName: "Expirience ", width: 200 },
+    { field: "subject", headerName: "Expertise ", width: 200 },
     {
       field: "delete",
       headerName: "Delete",
