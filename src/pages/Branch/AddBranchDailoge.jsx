@@ -50,14 +50,27 @@ const BranchDailog = ({
       }
     }
   };
+  console.log({
+    addBranchOption: totalSemvalues?.map((option) => ({
+      value: option,
+      label: option,
+    })),
+  });
   const handleFinalSubmit = () => {
+    console.log({ finalContainer: container });
+    const filterContainer = container.filter((d) => {
+      if (!d == undefined) {
+        return d;
+      }
+    });
+    console.log({ filterContainer });
     setSemesters((prev) => {
       return [
         ...prev,
         {
           branchname: branch,
           sem_name: currentsem,
-          subject: container,
+          subject: filterContainer,
         },
       ];
     });
