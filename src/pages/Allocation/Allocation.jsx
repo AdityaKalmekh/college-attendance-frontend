@@ -16,7 +16,6 @@ const AllocationCollection = () => {
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
-    id : "",
     facultyName: "",
     branch: "",
     semester: "",
@@ -27,6 +26,8 @@ const AllocationCollection = () => {
   const loadData = () => {
     getAllocation().then(setFacultyCollection);
   };
+
+  console.log(facultyCollection);
 
   useEffect(() => {
     loadData();
@@ -65,9 +66,9 @@ const AllocationCollection = () => {
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "facultyName", headerName: "Facuty Name", width: 200 },
-    { field: "branch", headerName: "Qulification ", width: 200 },
-    { field: "semester", headerName: "Expirience ", width: 200 },
-    { field: "subject", headerName: "Expertise ", width: 200 },
+    { field: "branch", headerName: "Branch", width: 200 },
+    { field: "semester", headerName: "Semester ", width: 200 },
+    { field: "subject", headerName: "Subject ", width: 200 },
     {
       field: "delete",
       headerName: "Delete",

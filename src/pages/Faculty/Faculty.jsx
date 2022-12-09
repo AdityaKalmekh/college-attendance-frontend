@@ -42,10 +42,9 @@ const FacultyCollection = () => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
       console.log(row);
-      deletefacultyData(row);
-      loadData();
+      deletefacultyData(row).then(loadData);
     }
-    toast.warning("Faculty Delete Sucessfully");
+    toast.success("Faculty Delete Sucessfully");
   };
   const handleEditClick = (row) => (event) => {
     console.log(row);

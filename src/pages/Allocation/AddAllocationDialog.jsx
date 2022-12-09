@@ -28,22 +28,18 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
   const [allocatedSubject, setAllocatedsubject] = useState();
   console.log({ branchCollection });
   console.log({ facultyCollection });
+
   const loadDataForFaculty = () => {
     getFaculty().then(setFacultyCollection);
+    getbranchName().then(setBranchCollection);
+    getSem(currentRow.branch).then(setSemCollection);
   };
 
   useEffect(() => {
     loadDataForFaculty();
   }, []);
 
-  const loadDataForBranch = () => {
-    getbranchName().then(setBranchCollection);
-  };
-
-  useEffect(() => {
-    loadDataForBranch();
-  }, []);
-
+  
   const formikRef = useRef();
 
   const branchHandler = (e) => {
@@ -66,6 +62,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
         console.log(values);
+        console.log(currentRow);
         if (currentRow.id) {
           updateAllocation({  
             ...values,
@@ -90,7 +87,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
       }
     });
   };
-
+  console.log(currentRow);
   return (
     <>
       <Dialog fullWidth open={open} onClose={onCancel}>
@@ -172,37 +169,22 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                   </Grid>
                   <br />
                   <Grid item xs={12} md={12}>
-                    <FormikController
-                      control="select"
-                      type="text"
-                      label="Semester"
-                      name="product"
-                      fullWidth
-                      options={semCollection.map((product) => {
-                        return {
-                          value: product,
-                          label: product,
-                        };
-                      })}
-                      value={formik.values.product}
-                      // onChange={(e) => {
-                      //   const productId = e.target.value;
-                      //   setAllocatedSemester(
-                      //     facultyCollection.find(
-                      //       (product) => product.product === productId
-                      //     )
-                      //   );
-
-                      //   formik.handleChange(e);
-                      // }}
-                      onChange = {semHandler}
-                      error={
-                        formik.touched.product && Boolean(formik.errors.product)
-                      }
-                      helperText={
-                        formik.touched.product && formik.errors.product
-                      }
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="fname">Select Faculty</InputLabel>
+                      <Select
+                        labelId="fname"
+                        id="fname"
+                        value={allocatedFacuty}
+                        label="Age"
+                        onChange={(e) => {
+                          setAllocatedFacuty(e.target.value);
+                        }}
+                      >
+                        {facultyCollection?.map((d, i) => {
+                          return <MenuItem value={i}>{d.fname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                   <Grid item xs={12} textAlign="left">

@@ -32,10 +32,8 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
   const formikRef = useRef();
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
-      console.log(currentRow);
       if (values) {
         if (currentRow.id) {
-          console.log("hi");
           updateStudent({
             ...values,
             course: branchData,

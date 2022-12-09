@@ -60,9 +60,7 @@ const StudentCollection = () => {
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      console.log(row);
-      deletestuentData(row);
-      loadData();
+      deletestuentData(row).then(loadData());
     }
   };
   const handleEditClick = (row) => (event) => {
