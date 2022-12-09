@@ -6,22 +6,24 @@ import {
   Box,
   Dialog,
   Grid,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@material-ui/core";
 import * as React from "react";
 import { useRef, useEffect } from "react";
 import { Form, Formik } from "formik";
-import FormikController from "../../formik/FormikController";
-import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/student";
 import { getbranchName, getSem } from "../../api/Branch";
 import { useState } from "react";
 
 const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
   const [viewBranch, setViewBranch] = useState([]);
-  const [viewSem,setSem] = useState([]);
+  const [viewSem, setSem] = useState([]);
   const [branchData, setBranchData] = useState();
-  const [branch, setBranch] = useState();
-  console.log({addi: branch});
+  const [selctedBranch, setSelctedBranch] = useState();
+  console.log({ branchData });
   const loadBranchData = () => {
     getbranchName().then(setViewBranch);
   };
@@ -36,28 +38,26 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
         if (currentRow.id) {
           updateStudent({
             ...values,
-            course: branchData,
+            course: selctedBranch,
           });
         } else {
           createStudent({
             ...values,
-            course: branch,
+            course: selctedBranch,
           });
         }
-        console.log({values})
+        console.log({ values });
         onCancel();
         loadData();
       }
     });
   };
 
-  const branchHandler = (event) => {
-    setBranch(event.target.value);
-    setBranchData(event.target.value);
-    getSem(event.target.value).then(setSem);
-    
-  }
-  console.log({branch});
+  // const branchHandler = (event) => {
+  //   setSelctedBranch(event.target.value);
+  //   setBranchData(event.target.value);
+  //   getSem(event.target.value).then(setSem);
+  // };
   // console.log(viewBranch);
   return (
     <>
@@ -155,60 +155,43 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow }) => {
                 <br />
                 <Grid item container spacing={2}>
                   <Grid item xs={12} md={6}>
-                    <FormikController
-                      sx={{ width: "16rem" }}
-                      variant="standard"
-                      control="select"
-                      type="text"
-                      label="Branch"
-                      name="branch"
-                      fullWidth
-                      options={viewBranch?.map((b) => ({
-                        value: b,
-                        label: b,
-                      }))}
-                      value={formik.values.course}
-                      // onChange={(e) => {
-                      //   const branchId = e.target.value;
-                      //   setBranchData(
-                      //     viewBranch?.find((b) => b.branchname === branchId)
-                      //   );
-
-                      //   formik.handleChange(e);
-                      // }}
-                      onChange = {branchHandler}
-                      error={
-                        formik.touched.branch && Boolean(formik.errors.branch)
-                      }
-                      helperText={formik.touched.branch && formik.errors.branch}
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="branch">Select Branch</InputLabel>
+                      <Select
+                        labelId="branch"
+                        id="branch"
+                        value={selctedBranch}
+                        label="Branch"
+                        onChange={(e) => {
+                          setSelctedBranch(e.target.value);
+                        }}
+                      >
+                        {viewBranch?.map((d, i) => {
+                          console.log({ d, i });
+                          return <MenuItem value={i}>{d.branchname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                   <Grid item xs={12} md={6}>
-                    <FormikController
-                      sx={{ width: "16rem" }}
-                      variant="standard"
-                      control="select"
-                      type="nember"
-                      label="Semester"
-                      name="sem"
-                      fullWidth
-                      options={viewSem?.map((b) => ({
-                        value: b,
-                        label: b,
-                      }))}
-                      value={formik.values.sem}
-                      onChange={(e) => {
-                        const semId = e.target.value;
-                        setBranchData(
-                          viewBranch?.find((b) => b.totalSemvalues === semId)
-                        );
-
-                        formik.handleChange(e);
-                      }}
-                      error={formik.touched.sem && Boolean(formik.errors.sem)}
-                      helperText={formik.touched.sem && formik.errors.sem}
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="branch">Select Branch</InputLabel>
+                      <Select
+                        labelId="branch"
+                        id="branch"
+                        value={selctedBranch}
+                        label="Branch"
+                        onChange={(e) => {
+                          setSelctedBranch(e.target.value);
+                        }}
+                      >
+                        {viewBranch?.map((d, i) => {
+                          console.log({ d, i });
+                          return <MenuItem value={i}>{d.branchname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                 </Grid>
