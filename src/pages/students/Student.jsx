@@ -1,7 +1,6 @@
 import { Button } from "@mui/material";
 import { getStudent } from "../../api/student";
 import { DataGrid } from "@mui/x-data-grid";
-
 import { css } from "@emotion/react";
 import StudentDialog from "./AddStudentDailoge";
 import { useState, useEffect } from "react";
@@ -26,7 +25,6 @@ const StudentCollection = () => {
     enroll: "",
     course: "",
     sem: "",
-    div: "",
     pcontact: "",
     scontact: "",
   };
@@ -76,7 +74,6 @@ const StudentCollection = () => {
       enroll: row.enroll ? row.enroll : "",
       course: row.course ? row.course : "",
       sem: row.sem ? row.sem : "",
-      div: row.div ? row.div : "",
       pcontact: row.pcontact ? row.pcontact : "",
       scontact: row.scontact ? row.scontact : "",
     });
@@ -92,7 +89,6 @@ const StudentCollection = () => {
     { field: "enroll", headerName: "Enrollment No", width: 150 },
     { field: "course", headerName: "Course", width: 150 },
     { field: "sem", headerName: "Sem", width: 50 },
-    { field: "div", headerName: "Div", width: 100 },
     { field: "pcontact", headerName: "Parents Contact ", width: 150 },
     { field: "scontact", headerName: "Student Contact ", width: 150 },
     {
