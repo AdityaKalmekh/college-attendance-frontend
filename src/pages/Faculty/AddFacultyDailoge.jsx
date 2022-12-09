@@ -19,7 +19,7 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
-        if (currentRow.firebaseId) {
+        if (currentRow.id) {
           updateFaculty({
             ...values,
           });
@@ -89,17 +89,17 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <TextField
                       control="input"
                       type="number"
-                      label="Expirience"
-                      name="expirience"
+                      label="Experience"
+                      name="experience"
                       fullWidth
-                      value={formik.values.expirience}
+                      value={formik.values.experience}
                       onChange={formik.handleChange}
                       error={
-                        formik.touched.expirience &&
-                        Boolean(formik.errors.expirience)
+                        formik.touched.experience &&
+                        Boolean(formik.errors.experience)
                       }
                       helperText={
-                        formik.touched.expirience && formik.errors.expirience
+                        formik.touched.experience && formik.errors.experience
                       }
                     />
                   </Grid>

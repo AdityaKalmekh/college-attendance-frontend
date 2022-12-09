@@ -6,6 +6,10 @@ import {
   Box,
   Dialog,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 import { toast } from "react-toastify";
 import * as React from "react";
@@ -14,12 +18,14 @@ import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
 import { createAllocation, updateAllocation } from "../../api/allocation";
 import { getFaculty } from "../../api/faculty";
-import { getBranch } from "../../api/Branch";
+import { getbranchName, getSem, getSubject, getId } from "../../api/Branch";
 import { useState, useEffect } from "react";
 
 const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [branchCollection, setBranchCollection] = useState([]);
+  const [semCollection, setSemCollection] = useState([]);
+  const [subjectCollection, setSubjectCollection] = useState([]);
   const [allocatedFacuty, setAllocatedFacuty] = useState();
   const [allocatedbranch, setallocatedbranch] = useState();
   const [allocatedSemester, setAllocatedSemester] = useState();
@@ -35,7 +41,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
   }, []);
 
   const loadDataForBranch = () => {
-    getBranch().then(setBranchCollection);
+    getbranchName().then(setBranchCollection);
   };
 
   useEffect(() => {
@@ -44,19 +50,42 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
 
   const formikRef = useRef();
 
+  const branchHandler = (e) => {
+    setallocatedbranch(e.target.value);
+    getSem(e.target.value).then(setSemCollection);
+  };
+
+  const semHandler = (e) => {
+    setAllocatedSemester(e.target.value);
+    getSubject(e.target.value).then(setSubjectCollection);
+  };
+
+  const facultyHandler = (e) => {
+    setAllocatedFacuty(e.target.value);
+    getId(e.target.value);
+  };
+
+  console.log({ allocatedFacuty });
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
       if (values) {
-        if (currentRow.firebaseId) {
-          createAllocation({
+        console.log(values);
+        if (currentRow.id) {
+          updateAllocation({
             ...values,
-            allocatedFacuty,
+            facultyName: allocatedFacuty,
+            branch: allocatedbranch,
+            semester: allocatedSemester,
+            subject: allocatedSubject,
           });
           toast.success("Faculty Allocation updated successfully");
         } else {
-          updateAllocation({
+          createAllocation({
             ...values,
-            allocatedFacuty,
+            facultyName: allocatedFacuty,
+            branch: allocatedbranch,
+            semester: allocatedSemester,
+            subject: allocatedSubject,
           });
           toast.success("Faculty Allocation created successfully");
         }
@@ -81,134 +110,80 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
             {(formik) => (
               <Form style={{ padding: "30px", paddingTop: "0px" }}>
                 <Grid item xs={12}>
-                  <FormikController
-                    control="select"
-                    type="text"
-                    label="Product*"
-                    name="product"
-                    fullWidth
-                    options={facultyCollection.map((f) => {
-                      return {
-                        value: f.fname,
-                        label: f.fname,
-                      };
-                    })}
-                    value={formik.values.product}
-                    onChange={(e) => {
-                      const productId = e.target.value;
-                      setAllocatedFacuty(
-                        facultyCollection.find(
-                          (product) => product.product === productId
-                        )
-                      );
-
-                      formik.handleChange(e);
-                    }}
-                    error={
-                      formik.touched.product && Boolean(formik.errors.product)
-                    }
-                    helperText={formik.touched.product && formik.errors.product}
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel id="fname">Select Faculty</InputLabel>
+                    <Select
+                      labelId="fname"
+                      id="fname"
+                      value={allocatedFacuty}
+                      label="Age"
+                      onChange={(e) => {
+                        setAllocatedFacuty(e.target.value);
+                      }}
+                    >
+                      {facultyCollection?.map((d, i) => {
+                        return <MenuItem value={i}>{d.fname}</MenuItem>;
+                      })}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <br />
                 <Grid item container spacing={2}>
                   <Grid item xs={12} md={12}>
-                    <FormikController
-                      control="select"
-                      type="text"
-                      label="Product*"
-                      name="product"
-                      fullWidth
-                      options={facultyCollection.map((product) => {
-                        return {
-                          value: product.product,
-                          label: product.product,
-                        };
-                      })}
-                      value={formik.values.product}
-                      onChange={(e) => {
-                        const productId = e.target.value;
-                        setallocatedbranch(
-                          facultyCollection.find(
-                            (product) => product.product === productId
-                          )
-                        );
-
-                        formik.handleChange(e);
-                      }}
-                      error={
-                        formik.touched.product && Boolean(formik.errors.product)
-                      }
-                      helperText={
-                        formik.touched.product && formik.errors.product
-                      }
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="fname">Select Faculty</InputLabel>
+                      <Select
+                        labelId="fname"
+                        id="fname"
+                        value={allocatedFacuty}
+                        label="Age"
+                        onChange={(e) => {
+                          setAllocatedFacuty(e.target.value);
+                        }}
+                      >
+                        {facultyCollection?.map((d, i) => {
+                          return <MenuItem value={i}>{d.fname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                   <Grid item xs={12} md={12}>
-                    <FormikController
-                      control="select"
-                      type="text"
-                      label="Product*"
-                      name="product"
-                      fullWidth
-                      options={facultyCollection.map((product) => {
-                        return {
-                          value: product.product,
-                          label: product.product,
-                        };
-                      })}
-                      value={formik.values.product}
-                      onChange={(e) => {
-                        const productId = e.target.value;
-                        setAllocatedSemester(
-                          facultyCollection.find(
-                            (product) => product.product === productId
-                          )
-                        );
-
-                        formik.handleChange(e);
-                      }}
-                      error={
-                        formik.touched.product && Boolean(formik.errors.product)
-                      }
-                      helperText={
-                        formik.touched.product && formik.errors.product
-                      }
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="fname">Select Faculty</InputLabel>
+                      <Select
+                        labelId="fname"
+                        id="fname"
+                        value={allocatedFacuty}
+                        label="Age"
+                        onChange={(e) => {
+                          setAllocatedFacuty(e.target.value);
+                        }}
+                      >
+                        {facultyCollection?.map((d, i) => {
+                          return <MenuItem value={i}>{d.fname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                   <Grid item xs={12} textAlign="left">
-                    <FormikController
-                      control="select"
-                      type="text"
-                      label="Product*"
-                      name="product"
-                      fullWidth
-                      options={facultyCollection.map((product) => {
-                        return {
-                          value: product.product,
-                          label: product.product,
-                        };
-                      })}
-                      value={formik.values.product}
-                      onChange={(e) => {
-                        const productId = e.target.value;
-                        setAllocatedsubject(
-                          facultyCollection.find(
-                            (product) => product.product === productId
-                          )
-                        );
-
-                        formik.handleChange(e);
-                      }}
-                      error={
-                        formik.touched.product && Boolean(formik.errors.product)
-                      }
-                      helperText={
-                        formik.touched.product && formik.errors.product
-                      }
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="fname">Select Faculty</InputLabel>
+                      <Select
+                        labelId="fname"
+                        id="fname"
+                        value={allocatedFacuty}
+                        label="Age"
+                        onChange={(e) => {
+                          setAllocatedFacuty(e.target.value);
+                        }}
+                      >
+                        {facultyCollection?.map((d, i) => {
+                          return <MenuItem value={i}>{d.fname}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <br />
                   <Button onClick={onSubmit} variant="contained" type="submit">

@@ -39,7 +39,7 @@ const BranchDailog = ({
     if (branchContainer) {
       if (currentRow.firebaseId) {
         updateExistingBranch(branchContainer).then(() => {
-          toast.success("Branch created successfully");
+          toast.success("Branch updated successfully");
           handleClickClose();
         });
       } else {
@@ -50,14 +50,27 @@ const BranchDailog = ({
       }
     }
   };
+  console.log({
+    addBranchOption: totalSemvalues?.map((option) => ({
+      value: option,
+      label: option,
+    })),
+  });
   const handleFinalSubmit = () => {
+    console.log({ finalContainer: container });
+    const filterContainer = container.filter((d) => {
+      if (!d == undefined) {
+        return d;
+      }
+    });
+    console.log({ filterContainer });
     setSemesters((prev) => {
       return [
         ...prev,
         {
           branchname: branch,
           sem_name: currentsem,
-          subject: container,
+          subject: filterContainer,
         },
       ];
     });
@@ -81,6 +94,8 @@ const BranchDailog = ({
     const containerCopy = [...container];
     containerCopy[index] = e.target.value;
     setcontainer(containerCopy);
+    containerCopy?.filter(item => item !== undefined && item !== null)
+    console.log({containerCopy});
   };
 
   const handleTotalSem = (e) => {

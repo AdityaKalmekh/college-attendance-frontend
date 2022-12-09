@@ -17,7 +17,7 @@ const FacultyCollection = () => {
   const initialValues = {
     fname: "",
     qulification: "",
-    expirience: "",
+    experience: "",
     expertise: "",
   };
 
@@ -48,22 +48,23 @@ const FacultyCollection = () => {
     toast.warning("Faculty Delete Sucessfully");
   };
   const handleEditClick = (row) => (event) => {
+    console.log(row);
     event.stopPropagation();
     setCurrentRow({
       fname: row.fname ? row.fname : "",
       qulification: row.qulification ? row.qulification : "",
-      expirience: row.expirience ? row.expirience : "",
+      experience: row.experience ? row.experience : "",
       expertise: row.expertise ? row.expertise : "",
-      firebaseid: row.firebaseid,
+      id: row._id ? row._id : "",
     });
     setOpen(true);
   };
-
+  console.log(facultyCollection);
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "fname", headerName: "Facuty Name", width: 200 },
     { field: "qulification", headerName: "Qulification ", width: 200 },
-    { field: "expirience", headerName: "Expirience ", width: 200 },
+    { field: "experience", headerName: "Expirience ", width: 200 },
     { field: "expertise", headerName: "Expertise ", width: 200 },
     {
       field: "delete",
