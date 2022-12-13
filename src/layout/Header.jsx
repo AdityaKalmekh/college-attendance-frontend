@@ -10,6 +10,7 @@ import DomainIcon from "@mui/icons-material/Domain";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import SchoolIcon from "@mui/icons-material/School";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import {
   Box,
   Divider,
@@ -104,6 +105,12 @@ const DRAWER_ITEMS = [
     route: "/Attendance",
     literal: "AttendenceCollection",
     Icon: AutoStoriesIcon,
+  },
+
+  {
+    route: "/graph",
+    literal: "Graph",
+    Icon: QueryStatsIcon,
   },
 ];
 
