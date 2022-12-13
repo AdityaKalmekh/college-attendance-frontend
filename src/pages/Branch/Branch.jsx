@@ -9,19 +9,21 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 // import { deletestuentData } from "../../api/student";
 import { deletebranchData } from "../../api/Branch";
+import { async } from "@firebase/util";
 
 const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  // const [branchArray, setBranchArray] = useState([]);
+  const [branchArray, setBranchArray] = useState([]);
 
   const initialValues = {
     branchname: "",
     totalsem: "",
     semesters: "",
   };
-  // console.log({ branchArray });
+  // let dt = [];
+  console.log({ branchArray });
 
   // const displayData = (item) => {
   //   const bname = item?.branch_name;
@@ -37,15 +39,34 @@ const BranchCollection = () => {
   //     ];
   //   });
   // };
+  const displayData = () => {
+    branchCollection.forEach(item => {
+      const branch = item.branchname;
+      const sem = item.sem.length;
 
+      console.log(branch);
+      console.log(sem);
+
+      setBranchArray(prev => {
+        return [...prev,{branchname:branch,totalsem:sem}]
+      })
+    }) 
+  }
+
+  console.log(branchArray);
   const loadData = () => {
     getBranch().then(setBranchCollection);
+    // displayData();
   };
 
   useEffect(() => {
     loadData();
     // displayData();
   }, []);
+
+  useEffect(() => {
+    displayData()
+  })
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -132,7 +153,7 @@ const BranchCollection = () => {
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={branchCollection?.map((branch, index) => ({
+          rows={branchArray?.map((branch, index) => ({
             ...branch,
             id: index + 1,
           }))}

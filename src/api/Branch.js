@@ -62,6 +62,7 @@ export const getbranchName = async () => {
 }
 
 export const getSem = async (branch) => {
+  console.log(branch);
   const data = [];
   try {
     const semesters = await http.get(`/semester/${branch}`)
@@ -71,23 +72,29 @@ export const getSem = async (branch) => {
   } catch (error) {
     console.log(error);
   }
-  console.log(data);
+  // console.log(data);
   return data;
 }
 
-export const getSubject = async (branch) => {
+export const getSubject = async (branch,semester) => {
   const data = [];
   try {
-    const subjects = await http.get(`/subject/${branch}`)
+    const subjects = await http.get(`/subject/${branch}/${semester}`)
     subjects.data.subject.map((subject) => {
       return data.push(subject);
     })
   } catch (error) {
     console.log(error);
   }
-  console.log(data);
+  return data;
 }
 
 export const getId = async (fName) => {
-  http.post(`/id/${fName}`);
+  try {
+    const id = await http.post(`/id/${fName}`);
+    console.log(id.data);
+    return id.data;  
+  } catch (error) {
+      console.error(error);   
+  }
 }

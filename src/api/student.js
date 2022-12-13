@@ -46,7 +46,7 @@ export const updateStudent = async (values) => {
 
 export const deletestuentData = async (values) => {
   console.log(values._id);
-  return http.delete(`/deleteStudent?id=${values._id}`);
+  return await http.delete(`/deleteStudent?id=${values._id}`);
   // try {
   //   await deleteDoc(doc(firestore, "student", values.firebaseId));
   // } catch (err) {

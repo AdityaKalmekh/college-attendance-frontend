@@ -8,6 +8,7 @@ import { Form, Formik } from "formik";
 import Loading from "../../common/Loader";
 import FormikController from "../../formik/FormikController";
 import { createBranch, updateBranch } from "../../api/Branch";
+import { Subject } from "@mui/icons-material";
 
 const BranchDailog = ({
   handleClickClose,
@@ -27,15 +28,35 @@ const BranchDailog = ({
   const [counter, setCounter] = useState([]);
   const [container, setcontainer] = useState([]);
   const [totalsem, setTotalsem] = useState();
+  
+  //aditya's branch code 
+
+  let sub = [];
+  const [subject,setSubject] = useState([]);
+  const [subSem,setSubsem] = useState([]);
 
   const onOk = () => {
+    subSem.forEach((item) => {
+      let subjects = []
+      subject.forEach((item2) => {
+        if (item.sem === item2.sem){
+          subjects.push(item2.subject)
+        }
+      })
+      item.subject = subjects
+    })
     const branchContainer = {
-      branchname: branch,
-      totalsem: totalsem,
-      semesters: semesters,
-      totalSemvalues: totalSemvalues,
-    };
-    console.log({ branchContainer });
+      branchname : branch,
+      sem : subSem
+    }
+    console.log(branchContainer);
+    // const branchContainer = {
+    //   branchname: branch,
+    //   totalsem: totalsem,
+    //   semesters: semesters,
+    //   totalSemvalues: totalSemvalues,
+    // };
+    // console.log({ branchContainer });
     if (branchContainer) {
       if (currentRow.firebaseId) {
         updateExistingBranch(branchContainer).then(() => {
@@ -56,29 +77,44 @@ const BranchDailog = ({
       label: option,
     })),
   });
+
   const handleFinalSubmit = () => {
-    console.log({ finalContainer: container });
-    const filterContainer = container.filter((d) => {
-      if (!d == undefined) {
-        return d;
-      }
-    });
-    console.log({ filterContainer });
-    setSemesters((prev) => {
-      return [
-        ...prev,
-        {
-          branchname: branch,
-          sem_name: currentsem,
-          subject: filterContainer,
-        },
-      ];
-    });
-    setcontainer([]);
+    if (sub.length !== 0){
+      setSubject(prev => {
+        return [...prev,{"sem":currentsem,"subject":sub[0]}]
+      })
+    }
+    
+    // console.log({ finalContainer: container });
+    // const filterContainer = container.filter((d) => {
+    //   if (!d == undefined) {
+    //     return d;
+    //   }
+    // });
+    // console.log({ filterContainer });
+    // setSemesters((prev) => {
+    //   return [
+    //     ...prev,
+    //     {
+    //       branchname: branch,
+    //       sem_name: currentsem,
+    //       subject: filterContainer,
+    //     },
+    //   ];
+    // });
+    // setcontainer([]);
   };
   console.log({ semesters });
+  console.log(subject);
 
   const handleClick = () => {
+    // subtemp.push({"subject":sub[0],"sem":currentsem});
+    if (sub.length !== 0){
+      setSubject(prev => {
+        return [...prev,{"sem":currentsem,"subject":sub[0]}]
+      })
+    }
+    sub = [];
     if (counter.length === 0) {
       console.log("s2");
       const d = [];
@@ -91,21 +127,32 @@ const BranchDailog = ({
   };
 
   const addSubject = (index) => (e) => {
-    const containerCopy = [...container];
-    containerCopy[index] = e.target.value;
-    setcontainer(containerCopy);
-    containerCopy?.filter(item => item !== undefined && item !== null)
-    console.log({containerCopy});
+    let subject = e.target.value;
+    if (sub.length === 0){
+      sub.push(subject)
+    }else if (subject.charAt(0) === sub[0].charAt(0)){
+      sub.pop();
+      sub.push(subject);
+    }
+    // const containerCopy = [...container];
+    // containerCopy[index] = e.target.value;
+    // setcontainer(containerCopy);
+    // containerCopy?.filter(item => item !== undefined && item !== null)
+    // console.log({containerCopy});
   };
 
   const handleTotalSem = (e) => {
-    setTotalsem(e.target.value);
+    // setTotalsem(e.target.value);
     let arr = [];
     for (let i = 1; i <= e.target.value; i++) {
       arr.push(i);
+      setSubsem(prev => {
+        return ([...prev,{"sem":i,"subject":[]}])
+      })
     }
     setTotalSemValues(arr);
   };
+  // console.log(subSem);
 
   const handleSelectedSem = (e) => {
     setcurrentsem(e.target.value);
