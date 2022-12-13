@@ -9,6 +9,7 @@ import {
 import { firestore } from "../firebase";
 import http from "../http-common";
 
+
 export const getAllocation = async () => {
   const data = [];
   const allocationData = await http.get("/getAllocation");
@@ -23,7 +24,7 @@ export const getAllocation = async () => {
 };
 
 export const createAllocation = async (values) => {
-
+  console.log(values);
   return http.post("/addAllocation", values);
   // try {
   //   await addDoc(collection(firestore, "allocation"), values);
@@ -33,6 +34,7 @@ export const createAllocation = async (values) => {
 };
 
 export const updateAllocation = async (values) => {
+  console.log(values);
   try {
     return http.put("/editAllocation", values);
   } catch (err) {
@@ -46,8 +48,9 @@ export const updateAllocation = async (values) => {
 };
 
 export const deleteallocationData = async (values) => {
+  console.log(values);
   try {
-    await deleteDoc(doc(firestore, "allocation", values.firebaseId));
+    return await http.delete(`/deleteAllocation?id=${values._id}`);
   } catch (err) {
     console.log({ err });
   }
