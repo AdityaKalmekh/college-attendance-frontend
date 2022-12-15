@@ -1,9 +1,20 @@
-import { Button, DialogTitle, Grid, Select, Typography } from "@mui/material";
+import {
+  Button,
+  DialogTitle,
+  Grid,
+  Select,
+  Typography,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import DialogForAttendance from "./DilogForAttendance";
 const AttendenceCollection = () => {
   const [open, setOpen] = useState(false);
   const [currentRow, setCurrentRow] = useState();
+  const [value, setValue] = useState(null);
 
   const initialValues = {
     bname: "",
@@ -35,7 +46,7 @@ const AttendenceCollection = () => {
           padding="1rem"
           paddingTop=""
         >
-          <Grid item md={4}>
+          <Grid item md={3}>
             <Typography>Select Any Branch</Typography>
             <Select
               control="select"
@@ -47,7 +58,7 @@ const AttendenceCollection = () => {
               // onChange={formik.handleChange}
             />
           </Grid>
-          <Grid item md={4}>
+          <Grid item md={3}>
             <Typography>Select Faculty</Typography>
             <Select
               control="select"
@@ -59,8 +70,8 @@ const AttendenceCollection = () => {
               // onChange={formik.handleChange}
             />
           </Grid>
-          <Grid item md={4}>
-            <Typography>Select Subject</Typography>
+          <Grid item md={3}>
+            <Typography>Select Sem</Typography>
             <Select
               control="select"
               type="text"
@@ -71,17 +82,29 @@ const AttendenceCollection = () => {
               // onChange={formik.handleChange}
             />
           </Grid>
-          <Grid item md={4}>
-            <Typography>Select Samester</Typography>
+          <Grid item md={3}>
+            <Typography>Select Any Subject</Typography>
             <Select
-              control="select"
-              type="text"
-              label="Branch"
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              label="Age"
               fullWidth
               name="sbranch"
               // value={}
               // onChange={formik.handleChange}
             />
+          </Grid>
+          <Grid item md={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Select Date"
+                value={value}
+                onChange={(newValue) => {
+                  setValue(newValue);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </LocalizationProvider>
           </Grid>
         </Grid>
       </Grid>
