@@ -6,6 +6,7 @@ import {
   Typography,
   TextField,
   Checkbox,
+  MenuItem
 } from "@mui/material";
 import { useState, useRef } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -15,10 +16,26 @@ import DialogForAttendance from "./DilogForAttendance";
 import { css } from "@emotion/react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Form, Formik } from "formik";
+import { isPageKeys } from "@mui/x-data-grid/utils/keyboardUtils";
+import { getbranchName, getSem, getSubject } from "../../api/Branch";
+import { useEffect } from "react";
+import { getAttendance, addAttendance, editAttendance } from "../../api/Attendance";
+import FormikController from "../../formik/FormikController";
+
 const AttendenceCollection = () => {
+  const [branchCollection, setBranchCollection] = useState([]);
+  const [semCollection, setSemCollection] = useState([]);
+  const [subjectCollection, setSubjectCollection] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState();
+  const [selectedSemester, setSelectedSemester] = useState();
+  const [selectedSubject, setSelectedSubject] = useState();
+  const [selectedLectureNo, setSelectedLectureNo] = useState();
+  let [students, setStudents] = useState([])
   const [open, setOpen] = useState(false);
   const [currentRow, setCurrentRow] = useState();
-  const [value, setValue] = useState(null);
+  // var mongoose = require('mongoose')
+  // const currentDate= new Date()
+  const [date, setDate] = useState(`${new Date().getMonth()+1}-${new Date().getDate()}-${new Date().getFullYear()}`);
   const formikRef = useRef();
 
   const initialValues = {
@@ -30,27 +47,44 @@ const AttendenceCollection = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 20 },
     {
-      field: "lastName",
+      field: "fname",
       headerName: "Student Name",
-      width: 250,
+      width: 150,
+      editable: true,
+    },
+    {
+      headerName: "Surname",
+      field: "sname",
       editable: true,
     },
     {
       field: "1",
-      headerName: "1",
+      headerName: "Status",
       width: 60,
       renderCell: ({ row }) => (
         <strong>
-          <GridActionsCellItem icon={<Checkbox />} label="1" />
+          <GridActionsCellItem icon={<Checkbox value={row.id} checked={row.AttendanceStatus === 1} onChange={changeAttendanceStatus} />} label="1" />
         </strong>
       ),
     },
   ];
 
-  const rows = [
-    { id: 1, lastName: "Snow", firstName: "Jon" },
-    { id: 2, lastName: "Joy", firstName: "Don" },
-  ];
+  console.log({date});
+  const changeAttendanceStatus = (e) => {
+    // console.log(e.target.value);
+    const index = e.target.value - 1;
+    students[index].AttendanceStatus === 1 ? students[index].AttendanceStatus = 0 : students[index].AttendanceStatus = 1
+    setStudents([...students])
+  }
+
+  console.log({ students });
+  useEffect(() => {
+    loadBranch()
+  }, [])
+
+  const loadBranch = () => {
+    getbranchName().then(setBranchCollection)
+  }
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -60,6 +94,44 @@ const AttendenceCollection = () => {
   const handleClickClose = () => {
     setOpen(false);
   };
+
+  const getStudents = () => {
+    getAttendance(selectedBranch, selectedSemester, selectedSubject, date, selectedLectureNo).then(setStudents)
+    // setStudents(it);
+  }
+
+  // console.log(students.objectId);
+  const saveData = () => {
+    if (students[0].objectId) {
+      const objectId = students[0].objectId
+      students = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
+      const data = {
+        "objectId" : objectId,
+        "lectureNo" : selectedLectureNo,
+        "students" : students
+      }
+      editAttendance(data);
+    } else {
+      // let a = students.map(myfunction)
+      // function myfunction(std){
+      //   var id = mongoose.Types.ObjectId(std._id)
+      //   console.log({id});
+      //   console.log(typeof(id));
+      // }
+      let presentAbsent = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
+      let Attendance = [{ "Lecture_NO": selectedLectureNo, "PresentAbsent": presentAbsent }]
+      // console.log({ Attendance });
+      let data = {
+        "Allocation_id": "",
+        "Date": date,
+        Attendance
+      }
+      // console.log({data});
+      // console.log({data});
+      addAttendance(data);
+    }
+  }
+  //console.log({ date });
 
   return (
     <>
@@ -76,7 +148,7 @@ const AttendenceCollection = () => {
           padding="1rem"
           paddingTop=""
         >
-          <Grid item md={3}>
+          <Grid item md={2.4}>
             <Typography>Select Any Branch</Typography>
             <Select
               control="select"
@@ -84,23 +156,20 @@ const AttendenceCollection = () => {
               label="Branch"
               fullWidth
               name="sbranch"
-              // value={}
-              // onChange={formik.handleChange}
-            />
+              value={selectedBranch}
+              onChange={(e) => {
+                setSelectedBranch(e.target.value)
+                getSem(e.target.value).then(setSemCollection)
+              }}
+            // value={}
+            // onChange={formik.handleChange}
+            >
+              {branchCollection?.map((d) => {
+                return <MenuItem value={d}>{d}</MenuItem>;
+              })}
+            </Select>
           </Grid>
-          <Grid item md={3}>
-            <Typography>Select Faculty</Typography>
-            <Select
-              control="select"
-              type="text"
-              label="Branch"
-              fullWidth
-              name="sbranch"
-              // value={}
-              // onChange={formik.handleChange}
-            />
-          </Grid>
-          <Grid item md={3}>
+          <Grid item md={2.4}>
             <Typography>Select Sem</Typography>
             <Select
               control="select"
@@ -108,11 +177,18 @@ const AttendenceCollection = () => {
               label="Branch"
               fullWidth
               name="sbranch"
-              // value={}
-              // onChange={formik.handleChange}
-            />
+              value={selectedSemester}
+              onChange={(e) => {
+                setSelectedSemester(e.target.value)
+                getSubject(selectedBranch, e.target.value).then(setSubjectCollection)
+              }}
+            >
+              {semCollection?.map((d, i) => {
+                return <MenuItem value={d}>{d}</MenuItem>;
+              })}
+            </Select>
           </Grid>
-          <Grid item md={3}>
+          <Grid item md={2.4}>
             <Typography>Select Any Subject</Typography>
             <Select
               labelId="demo-simple-select-label"
@@ -120,17 +196,47 @@ const AttendenceCollection = () => {
               label="Age"
               fullWidth
               name="sbranch"
+              value={selectedSubject}
               // value={}
-              // onChange={formik.handleChange}
+              onChange={(e) => { setSelectedSubject(e.target.value) }}
+            >
+              {subjectCollection?.map((d) => {
+                return <MenuItem value={d}>{d}</MenuItem>;
+              })}
+            </Select>
+          </Grid>
+          <Grid item md={2.4} textAlign="left">
+            <Typography>Select Lecture No</Typography>
+            <FormikController
+              control="input"
+              type="number"
+              value={selectedLectureNo}
+              // label = "Lecture No"
+              fullWidth
+              onChange={(e) => { setSelectedLectureNo(e.target.value) }}
             />
           </Grid>
-          <Grid item md={3}>
+          <Grid item md={2.4}>
+            <Typography>Select Date</Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Select Date"
-                value={value}
-                onChange={(newValue) => {
-                  setValue(newValue);
+                // label="Select Date"
+                // inputFormat="DD/MM/YYYY"
+                value={date}
+                onChange={(e) => {
+                  // console.log(e.toLocaleDateString());
+                  // setDate(e);
+                  // console.log(e.$d.getDate());
+                  // var dd = e.$d.getDate()
+                  // var mm = e.$d.getMonth()+1
+                  // var yyyy = e.$d.getFullYear()
+                  // if (dd < 10){
+                  //   dd = '0' + dd
+                  // }if (mm < 10){
+                  //   mm = '0' + mm
+                  // }
+                  setDate(`${e.$d.getMonth() + 1}-${e.$d.getDate()}-${e.$d.getFullYear()}`);
+                  // setDate(dd+'/'+mm+'/'+yyyy)
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -138,16 +244,17 @@ const AttendenceCollection = () => {
           </Grid>
         </Grid>
       </Grid>
-      {open && (
+
+      {/* {open && (
         <DialogForAttendance
           open={open}
           handleClickClose={handleClickClose}
           // loadData={loadData}
           currentRow={currentRow}
         />
-      )}
+      )} */}
       <Button
-        onClick={handleClickOpen}
+        onClick={getStudents}
         variant="contained"
         sx={{ margin: "10px" }}
       >
@@ -157,7 +264,7 @@ const AttendenceCollection = () => {
         <Formik
           innerRef={formikRef}
           initialValues={currentRow}
-          onSubmit={(values) => values}
+        // onSubmit={(values) => values}
         >
           {(formik) => (
             <Form>
@@ -166,11 +273,12 @@ const AttendenceCollection = () => {
                   <DialogTitle style={{ paddingBottom: "0px" }}>
                     Attendance Sheet
                   </DialogTitle>
-                  <div style={{ height: 500, width: "100%" }}>
+                  <div style={{ height: 300, width: "100%" }}>
                     <DataGrid
                       editMode="row"
                       const
-                      rows={rows}
+                      rows={students.map((student, index) => ({ ...student, id: index + 1 }))}
+                      // rows={rows}
                       columns={columns}
                       css={css`
                         height: calc(100vh - 1500px - 30px) !important;
@@ -182,6 +290,9 @@ const AttendenceCollection = () => {
                 </Grid>
                 <br />
               </Grid>
+              <Button onClick={saveData} variant="contained">
+                Submit
+              </Button>
             </Form>
           )}
         </Formik>

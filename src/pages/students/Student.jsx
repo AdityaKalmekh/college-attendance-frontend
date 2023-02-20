@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { getStudent } from "../../api/student";
+// import { getStudent } from "../../api/student";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
 import StudentDialog from "./AddStudentDailoge";
@@ -9,6 +9,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { deletestuentData } from "../../api/student";
 import AddMultipleStudents from "./AddMultipalStudent";
+import useHttp from "../../hooks/useHttp";
 
 const StudentCollection = () => {
   const [open, setOpen] = useState(false);
@@ -29,14 +30,42 @@ const StudentCollection = () => {
     scontact: "",
   };
 
-  const loadData = () => {
-    getStudent().then(setStudentCollection);
+  const {error,sendRequest: fetchTasks} = useHttp();
+
+  const loadData = (data) => {
+    setStudentCollection(data.studentData);
   };
-  console.log(studentCollection);
+
+  // const loadData = () => {  
+  //   getStudent().then(setStudentCollection);
+  // };
+
+  const addGetNewStudent = (student) => {
+    setStudentCollection((prev) => prev.concat(student));
+  }
+
+  const resetAfterDelection = (id,taskData) => {
+    if (taskData){
+      const indexDelete = studentCollection.findIndex(student => student._id === id)
+      setStudentCollection(prev => prev.filter((_,index) => index !== indexDelete))
+    }
+  }
+
+  const resetAfterUpdation = (data,acknowledged) => {
+    if (acknowledged){
+      const indexEdit = studentCollection.findIndex(student => student._id === data._id)
+      studentCollection[indexEdit] = data
+      setStudentCollection([...studentCollection])
+    }
+  }
 
   useEffect(() => {
-    loadData();
-  }, []);
+     fetchTasks({url:'/getStudents',method:'get'},loadData);
+  }, [fetchTasks]);
+
+  // useEffect(() =>{
+  //   loadData()
+  // },[])
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -58,13 +87,16 @@ const StudentCollection = () => {
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      deletestuentData(row).then(loadData());
+      // deletestuentData(row).then(loadData);
+       fetchTasks({url:'/deleteStudent',method:"delete",id:row._id},resetAfterDelection.bind(null,row._id))
     }
   };
+  
   const handleEditClick = (row) => (event) => {
+    console.log(row._id)
     event.stopPropagation();
     setCurrentRow({
-      id : row._id ? row._id : "",
+      _id : row._id ? row._id :"",
       fname: row.fname ? row.fname : "",
       mname: row.mname ? row.mname : "",
       sname: row.sname ? row.sname : "",
@@ -78,8 +110,9 @@ const StudentCollection = () => {
     setOpen(true);
   };
 
+
   const columns = [
-    { field: "id", headerName: "SR.", width: 50 },
+    {field : "id", headerName: "SR.", width:50},
     { field: "fname", headerName: "First Name", width: 150 },
     { field: "mname", headerName: "Middle Name", width: 150 },
     { field: "sname", headerName: "SureName", width: 150 },
@@ -129,6 +162,8 @@ const StudentCollection = () => {
           onCancel={handleClickClose}
           loadData={loadData}
           currentRow={currentRow}
+          addGetNewStudent = {addGetNewStudent}
+          resetAfterUpdation = {resetAfterUpdation}
         />
       )}
       {openAddFileDialog && (
@@ -147,10 +182,10 @@ const StudentCollection = () => {
       <Button onClick={handleOpenAddFileDialog} variant="contained">
         Add From Excel File
       </Button>
-      <div style={{ height: 475, width: "100%" }}>
+      <div style={{ height: 450, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={studentCollection?.map((student, index) => ({
+          rows={studentCollection.map((student, index) => ({
             ...student,
             id: index + 1,
           }))}

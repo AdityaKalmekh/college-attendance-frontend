@@ -6,6 +6,7 @@ import { Button, Typography } from "@mui/material";
 import FormikController from "../../formik/FormikController";
 import { createUserSignup } from "../../api/Signup";
 import { loginButtonWidth } from "../../components/login/loginStyles";
+import useHttp from "../../hooks/useHttp";
 
 const SignupForm = () => {
   // const formikRef = useRef();
@@ -15,6 +16,17 @@ const SignupForm = () => {
     password: "",
     confirmpassword: "",
   };
+
+  const {sendRequest : sendTaskRequest} = useHttp();
+
+  const loadNewUser = (values,response) =>{
+    if (response === true){
+      toast.error("Email already exists")
+    }else{
+      console.log("hello");
+    }
+  }
+
   const validationSchema = Yup.object({
     email: Yup.string().email().required("Required"),
     password: Yup.string().required("Required"),
@@ -26,8 +38,11 @@ const SignupForm = () => {
 
   const onSubmit = (values, { resetForm }) => {
     if (values) {
-      createUserSignup(values)
-        .then(() => {
+      // createUserSignup(values)
+      sendTaskRequest({
+        url:"/addUser",
+        method:"post",
+        data : values},loadNewUser.bind(null,values)).then(() => {
           resetForm();
         })
         .catch((err) => {

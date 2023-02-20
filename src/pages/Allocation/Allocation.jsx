@@ -26,8 +26,6 @@ const AllocationCollection = () => {
     getAllocation().then(setFacultyCollection);
   };
 
-  console.log(facultyCollection);
-
   useEffect(() => {
     loadData();
   }, []);
@@ -51,7 +49,6 @@ const AllocationCollection = () => {
   };
   
   const handleEditClick = (row) => (event) => {
-    console.log({row});
     event.stopPropagation();
     setCurrentRow({
       facultyId : row.facultyId ? row.facultyId : "",

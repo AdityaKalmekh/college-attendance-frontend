@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { firestore } from "../firebase";
 import http from "../http-common";
+import useHttp from "../hooks/useHttp";
 
 export const getStudent = async () => {
   // const data = [];
@@ -17,13 +18,14 @@ export const getStudent = async () => {
   // });
   // return data;
 
-  const dt = [];
-  const studentData = await http.get("/getStudents");
-  studentData.data.students.map((student) => {
-    return dt.push(student);
-  });
-  console.log(dt);
-  return dt;
+  // const dt = [];
+  // const studentData = await http.get("/getStudents");
+  // console.log(studentData);
+  // studentData.data.studentData.map((student) => {
+  //   return dt.push(student);
+  // });
+  // console.log(dt);
+  // return dt;
 };
 
 export const createStudent = async (values) => {

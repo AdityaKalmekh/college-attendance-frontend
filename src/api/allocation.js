@@ -25,7 +25,7 @@ export const getAllocation = async () => {
 
 export const createAllocation = async (values) => {
   console.log(values);
-  return http.post("/addAllocation", values);
+  return await http.post("/addAllocation", values);
   // try {
   //   await addDoc(collection(firestore, "allocation"), values);
   // } catch (err) {

@@ -8,6 +8,7 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from "react-toastify";
+import useHttp from "../../hooks/useHttp";
 
 const FacultyCollection = () => {
   const [open, setOpen] = useState(false);
@@ -15,19 +16,40 @@ const FacultyCollection = () => {
   const [currentRow, setCurrentRow] = useState();
 
   const initialValues = {
+    _id : "",
     fname: "",
     qulification: "",
     experience: "",
     expertise: "",
   };
 
-  const loadData = () => {
-    getFaculty().then(setFacultyCollection);
+  const {error, sendRequest : fetchTasks} = useHttp();
+
+  const loadData = (data) => {
+    console.log(data.faculty);
+    setFacultyCollection(data.faculty);
   };
 
+  const resetAfterDelection = (id,taskData) => {
+    if (taskData){
+      toast.success("Faculty Delete Sucessfully");
+      const indexDelete = facultyCollection.findIndex(faculty => faculty._id === id)
+      setFacultyCollection(prev => prev.filter((_,index) => index !== indexDelete))
+    }
+  }
+
+  const reloadNewData  = (student) => {
+    toast.success("Faculty Added Sucessfully");
+    setFacultyCollection((prev) => prev.concat(student));
+  }
+
   useEffect(() => {
-    loadData();
-  }, []);
+    fetchTasks({url:'/getFaculty',method:'get'},loadData);
+  },[fetchTasks]);
+
+  // useEffect(() => {
+  //   loadData();
+  // }, []);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -38,27 +60,33 @@ const FacultyCollection = () => {
     setOpen(false);
   };
 
+  const reloadAfterUpdation = (data,acknowledged) => {
+    if (acknowledged){
+      const indexEdit = facultyCollection.findIndex(faculty => faculty._id === data._id)
+      facultyCollection[indexEdit] = data
+      setFacultyCollection([...facultyCollection])
+    }
+  }
+
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      console.log(row);
-      deletefacultyData(row).then(loadData);
+      fetchTasks({url : "/deleteFaculty",method:"delete",id:row._id},resetAfterDelection.bind(null,row._id))
     }
-    toast.success("Faculty Delete Sucessfully");
   };
+  
   const handleEditClick = (row) => (event) => {
-    console.log(row);
     event.stopPropagation();
     setCurrentRow({
+      _id: row._id ? row._id : "",
       fname: row.fname ? row.fname : "",
       qulification: row.qulification ? row.qulification : "",
       experience: row.experience ? row.experience : "",
       expertise: row.expertise ? row.expertise : "",
-      id: row._id ? row._id : "",
     });
     setOpen(true);
   };
-  console.log(facultyCollection);
+
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },
     { field: "fname", headerName: "Facuty Name", width: 200 },
@@ -105,6 +133,8 @@ const FacultyCollection = () => {
           onCancel={handleClickClose}
           loadData={loadData}
           currentRow={currentRow}
+          reloadNewData={reloadNewData}
+          reloadAfterUpdation={reloadAfterUpdation}
         />
       )}
       <Button
@@ -117,7 +147,7 @@ const FacultyCollection = () => {
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={facultyCollection?.map((student, index) => ({
+          rows={facultyCollection.map((student, index) => ({
             ...student,
             id: index + 1,
           }))}

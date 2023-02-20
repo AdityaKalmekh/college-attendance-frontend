@@ -12,27 +12,60 @@ import * as React from "react";
 import { useRef } from "react";
 import { Form, Formik } from "formik";
 import { createFaculty, updateFaculty } from "../../api/faculty";
+import useHttp from "../../hooks/useHttp";
 
-const FacultyDialog = ({ open, onCancel, loadData, currentRow }) => {
+const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, reloadAfterUpdation }) => {
   const formikRef = useRef();
+
+  const {sendRequest : sendTaskRequest} = useHttp();
+
+  const reloadCreateData = (values, id) => {
+    if (id){
+      reloadNewData(values)
+    }
+  }
+
+  const reloadEditData = (values,acknowledgment) => {
+    if (acknowledgment){
+      reloadAfterUpdation(values,acknowledgment)
+    }
+  }
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
-      if (values) {
-        if (currentRow.id) {
-          updateFaculty({
-            ...values,
-          });
-          toast.success("Faculty updated successfully");
-        } else {
-          createFaculty({
-            ...values,
-          });
-          toast.success("Faculty created successfully");
+      console.log({values});
+      console.log({currentRow});
+      if (values){
+        if (currentRow._id){
+          sendTaskRequest({
+            url : "/editFaculty",
+            method : "put",
+            data : values
+          },reloadEditData.bind(null,values))
+        }else{
+          sendTaskRequest({
+            url : "/addFaculty",
+            method : "post",
+            data : values
+          },reloadCreateData.bind(null,values))
         }
-        onCancel();
-        loadData();
+        onCancel()
       }
+      // if (values) {
+      //   if (currentRow.id) {
+      //     updateFaculty({
+      //       ...values,
+      //     });
+      //     toast.success("Faculty updated successfully");
+      //   } else {
+      //     createFaculty({
+      //       ...values,
+      //     });
+      //     toast.success("Faculty created successfully");
+      //   }
+      //   onCancel();
+      //   loadData();
+      // }
     });
   };
 

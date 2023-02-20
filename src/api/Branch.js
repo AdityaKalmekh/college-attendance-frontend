@@ -24,7 +24,7 @@ export const getBranch = async () => {
 };
 
 export const createBranch = async (values) => {
-  return http.post("/addBranch", values);
+  return await http.post("/addBranch", values);
   // try {
   //   await addDoc(collection(firestore, "branch"), values);
   // } catch (err) {
@@ -41,11 +41,12 @@ export const updateBranch = async (values) => {
 };
 
 export const deletebranchData = async (values) => {
-  try {
-    await deleteDoc(doc(firestore, "branch", values.firebaseId));
-  } catch (err) {
-    console.log({ err });
-  }
+  console.log(values);
+  // try {
+  //   await http.delete("/deleteBranch");
+  // } catch (err) {
+  //   console.log({ err });
+  // }
 };
 
 export const getbranchName = async () => {
@@ -62,7 +63,6 @@ export const getbranchName = async () => {
 }
 
 export const getSem = async (branch) => {
-  console.log(branch);
   const data = [];
   try {
     const semesters = await http.get(`/semester/${branch}`)
@@ -72,7 +72,6 @@ export const getSem = async (branch) => {
   } catch (error) {
     console.log(error);
   }
-  // console.log(data);
   return data;
 }
 
@@ -97,4 +96,15 @@ export const getId = async (fName) => {
   } catch (error) {
       console.error(error);   
   }
+}
+
+export const getAllSubjects = async (branch,sem) => {
+  const data = []
+  try {
+    const subjects = await http.get(`/getAllSubjects/${branch}/${sem}`)
+    subjects.data.map((subject) => {return data.push(subject)})
+  } catch (error) {
+    console.error(error);   
+  }
+  return data
 }

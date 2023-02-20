@@ -8,7 +8,7 @@ import { Form, Formik } from "formik";
 import Loading from "../../common/Loader";
 import FormikController from "../../formik/FormikController";
 import { createBranch, updateBranch } from "../../api/Branch";
-import { Subject } from "@mui/icons-material";
+// import { Subject } from "@mui/icons-material";
 
 const BranchDailog = ({
   handleClickClose,
@@ -24,10 +24,10 @@ const BranchDailog = ({
   const [totalSemvalues, setTotalSemValues] = useState([]);
   const [branch, setbranch] = useState();
   const [currentsem, setcurrentsem] = useState();
-  const [semesters, setSemesters] = useState([]);
+  // const [semesters, setSemesters] = useState([]);
   const [counter, setCounter] = useState([]);
   const [container, setcontainer] = useState([]);
-  const [totalsem, setTotalsem] = useState();
+  // const [totalsem, setTotalsem] = useState();
   
   //aditya's branch code 
 
@@ -47,7 +47,7 @@ const BranchDailog = ({
     })
     const branchContainer = {
       branchname : branch,
-      sem : subSem
+      semesters : subSem
     }
     console.log(branchContainer);
     // const branchContainer = {
@@ -104,7 +104,7 @@ const BranchDailog = ({
     // });
     // setcontainer([]);
   };
-  console.log({ semesters });
+  // console.log({ semesters });
   console.log(subject);
 
   const handleClick = () => {

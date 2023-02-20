@@ -9,13 +9,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 // import { deletestuentData } from "../../api/student";
 import { deletebranchData } from "../../api/Branch";
-import { async } from "@firebase/util";
+// import { async } from "@firebase/util";
 
 const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
   const [branchArray, setBranchArray] = useState([]);
+  let branchContainer = [];
 
   const initialValues = {
     branchname: "",
@@ -39,34 +40,30 @@ const BranchCollection = () => {
   //     ];
   //   });
   // };
+  
   const displayData = () => {
     branchCollection.forEach(item => {
-      const branch = item.branchname;
-      const sem = item.sem.length;
-
-      console.log(branch);
-      console.log(sem);
-
-      setBranchArray(prev => {
-        return [...prev,{branchname:branch,totalsem:sem}]
-      })
+      branchContainer.push({branch: item.branchname,sem: item.semesters.length}); 
     }) 
   }
+  console.log({branchContainer});
 
-  console.log(branchArray);
   const loadData = () => {
     getBranch().then(setBranchCollection);
-    // displayData();
   };
 
+  console.log({branchCollection});
+  
   useEffect(() => {
     loadData();
     // displayData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   useEffect(() => {
     displayData()
-  })
+  },[]);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -78,11 +75,12 @@ const BranchCollection = () => {
   };
 
   const handleDeleteClick = (row) => (event) => {
-    event.stopPropagation();
-    if (window.confirm("Are you sure to delete?") === true) {
-      deletebranchData(row);
-      loadData();
-    }
+    console.log(row);
+    // event.stopPropagation();
+    // if (window.confirm("Are you sure to delete?") === true) {
+    //   deletebranchData(row);
+    //   loadData();
+    // }
   };
   const handleEditClick = (row) => (event) => {
     console.log(row);
@@ -153,10 +151,21 @@ const BranchCollection = () => {
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={branchArray?.map((branch, index) => ({
-            ...branch,
-            id: index + 1,
-          }))}
+          rows={branchCollection?.map((branch, index) => {
+            console.log({sem : branch.semesters.length});
+            return ({
+              branchname : branch.branchname,
+              totalsem : branch.semesters.length,
+              id : index + 1
+            })
+          }
+            
+          //   ({
+          //   ...branch,
+          //   semesters: branch.semesters.length,
+          //   id: index + 1,
+          // }))}
+  )}
           columns={columns}
           css={css`
             height: calc(100vh - 1500px - 30px) !important;
