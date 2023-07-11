@@ -12,37 +12,30 @@ import { useState, useRef } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import DialogForAttendance from "./DilogForAttendance";
 import { css } from "@emotion/react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { Form, Formik } from "formik";
-import { isPageKeys } from "@mui/x-data-grid/utils/keyboardUtils";
-import { getbranchName, getSem, getSubject } from "../../api/Branch";
 import { useEffect } from "react";
-import { getAttendance, addAttendance, editAttendance } from "../../api/Attendance";
-import FormikController from "../../formik/FormikController";
+import useHttp from "../../hooks/useHttp";
+import { toast } from "react-toastify";
+import { useAuthContext } from "../../context";
 
 const AttendenceCollection = () => {
+  const {id} = useAuthContext();
   const [branchCollection, setBranchCollection] = useState([]);
   const [semCollection, setSemCollection] = useState([]);
   const [subjectCollection, setSubjectCollection] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState();
-  const [selectedSemester, setSelectedSemester] = useState();
-  const [selectedSubject, setSelectedSubject] = useState();
-  const [selectedLectureNo, setSelectedLectureNo] = useState();
   let [students, setStudents] = useState([])
-  const [open, setOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState();
-  // var mongoose = require('mongoose')
-  // const currentDate= new Date()
-  const [date, setDate] = useState(`${new Date().getMonth()+1}-${new Date().getDate()}-${new Date().getFullYear()}`);
   const formikRef = useRef();
-
-  const initialValues = {
-    bname: "",
-    tsem: "",
-    tsubname: "",
-  };
+  const {error,sendRequest : sendTaskRequest} = useHttp();
+  
+  const [currentRow,setCurrentRow] = useState({
+    branch: "",
+    semester: "",
+    subject: "",
+    lectureNo: "",
+    date:`${new Date().getMonth()+1}-${new Date().getDate()}-${new Date().getFullYear()}`
+  })
 
   const columns = [
     { field: "id", headerName: "ID", width: 20 },
@@ -69,69 +62,63 @@ const AttendenceCollection = () => {
     },
   ];
 
-  console.log({date});
   const changeAttendanceStatus = (e) => {
-    // console.log(e.target.value);
     const index = e.target.value - 1;
     students[index].AttendanceStatus === 1 ? students[index].AttendanceStatus = 0 : students[index].AttendanceStatus = 1
     setStudents([...students])
   }
 
-  console.log({ students });
   useEffect(() => {
-    loadBranch()
-  }, [])
+    sendTaskRequest({url:`/getFacultyBranch/${id}`,method:"get"},(branch) => {setBranchCollection(branch)})
+  }, [sendTaskRequest,id])
 
-  const loadBranch = () => {
-    getbranchName().then(setBranchCollection)
+  const onSubmit = () => {
+    formikRef.current.submitForm().then((values) =>{
+      setCurrentRow(values)
+      sendTaskRequest({url:`/getAttendance/${values.branch}/${values.semester}/${values.subject}/${values.date}/${values.lectureNo}`,method:"get"},(students)=>{setStudents(students)})
+    })
   }
 
-  const handleClickOpen = () => {
-    setCurrentRow(initialValues);
-    setOpen(true);
-  };
-
-  const handleClickClose = () => {
-    setOpen(false);
-  };
-
-  const getStudents = () => {
-    getAttendance(selectedBranch, selectedSemester, selectedSubject, date, selectedLectureNo).then(setStudents)
-    // setStudents(it);
+  const addAttendanceAcknowlegement = (acknowledgment) => {
+    if (acknowledgment){
+      toast.success("Attendance Marked Successfully")
+      setStudents([])
+    }
   }
 
-  // console.log(students.objectId);
+  const editAttendanceAcknowlegement = (acknowledgment) => {
+    if (acknowledgment){
+      toast.success("Attendance Upated Successfully")
+      setStudents([])
+    }
+  }
+
   const saveData = () => {
     if (students[0].objectId) {
       const objectId = students[0].objectId
       students = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
       const data = {
         "objectId" : objectId,
-        "lectureNo" : selectedLectureNo,
+        "lectureNo" : currentRow.lectureNo,
         "students" : students
       }
-      editAttendance(data);
+      sendTaskRequest({url:"/editAttendance",data:data,method:"put"},editAttendanceAcknowlegement)
     } else {
-      // let a = students.map(myfunction)
-      // function myfunction(std){
-      //   var id = mongoose.Types.ObjectId(std._id)
-      //   console.log({id});
-      //   console.log(typeof(id));
-      // }
       let presentAbsent = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
-      let Attendance = [{ "Lecture_NO": selectedLectureNo, "PresentAbsent": presentAbsent }]
-      // console.log({ Attendance });
+      let Attendance = [{ "lectureNo": currentRow.lectureNo, "PresentAbsent": presentAbsent }]
+      console.log({ Attendance });
       let data = {
         "Allocation_id": "",
-        "Date": date,
+        "Date": currentRow.date,
         Attendance
       }
-      // console.log({data});
-      // console.log({data});
-      addAttendance(data);
+      sendTaskRequest({url:"/addAttendance",data:data,method:"post"},addAttendanceAcknowlegement)
     }
   }
-  //console.log({ date });
+
+  if (error){
+    console.log({error});
+  }
 
   return (
     <>
@@ -139,164 +126,139 @@ const AttendenceCollection = () => {
         <DialogTitle style={{ paddingBottom: "0px" }}>
           Fill a Details
         </DialogTitle>
-        <Grid
-          item
-          container
-          display="flex"
-          flexDirection="row"
-          spacing={2}
-          padding="1rem"
-          paddingTop=""
-        >
-          <Grid item md={2.4}>
-            <Typography>Select Any Branch</Typography>
-            <Select
-              control="select"
-              type="text"
-              label="Branch"
-              fullWidth
-              name="sbranch"
-              value={selectedBranch}
-              onChange={(e) => {
-                setSelectedBranch(e.target.value)
-                getSem(e.target.value).then(setSemCollection)
-              }}
-            // value={}
-            // onChange={formik.handleChange}
-            >
-              {branchCollection?.map((d) => {
-                return <MenuItem value={d}>{d}</MenuItem>;
-              })}
-            </Select>
-          </Grid>
-          <Grid item md={2.4}>
-            <Typography>Select Sem</Typography>
-            <Select
-              control="select"
-              type="text"
-              label="Branch"
-              fullWidth
-              name="sbranch"
-              value={selectedSemester}
-              onChange={(e) => {
-                setSelectedSemester(e.target.value)
-                getSubject(selectedBranch, e.target.value).then(setSubjectCollection)
-              }}
-            >
-              {semCollection?.map((d, i) => {
-                return <MenuItem value={d}>{d}</MenuItem>;
-              })}
-            </Select>
-          </Grid>
-          <Grid item md={2.4}>
-            <Typography>Select Any Subject</Typography>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Age"
-              fullWidth
-              name="sbranch"
-              value={selectedSubject}
-              // value={}
-              onChange={(e) => { setSelectedSubject(e.target.value) }}
-            >
-              {subjectCollection?.map((d) => {
-                return <MenuItem value={d}>{d}</MenuItem>;
-              })}
-            </Select>
-          </Grid>
-          <Grid item md={2.4} textAlign="left">
-            <Typography>Select Lecture No</Typography>
-            <FormikController
-              control="input"
-              type="number"
-              value={selectedLectureNo}
-              // label = "Lecture No"
-              fullWidth
-              onChange={(e) => { setSelectedLectureNo(e.target.value) }}
-            />
-          </Grid>
-          <Grid item md={2.4}>
-            <Typography>Select Date</Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                // label="Select Date"
-                // inputFormat="DD/MM/YYYY"
-                value={date}
-                onChange={(e) => {
-                  // console.log(e.toLocaleDateString());
-                  // setDate(e);
-                  // console.log(e.$d.getDate());
-                  // var dd = e.$d.getDate()
-                  // var mm = e.$d.getMonth()+1
-                  // var yyyy = e.$d.getFullYear()
-                  // if (dd < 10){
-                  //   dd = '0' + dd
-                  // }if (mm < 10){
-                  //   mm = '0' + mm
-                  // }
-                  setDate(`${e.$d.getMonth() + 1}-${e.$d.getDate()}-${e.$d.getFullYear()}`);
-                  // setDate(dd+'/'+mm+'/'+yyyy)
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Grid>
-        </Grid>
-      </Grid>
-
-      {/* {open && (
-        <DialogForAttendance
-          open={open}
-          handleClickClose={handleClickClose}
-          // loadData={loadData}
-          currentRow={currentRow}
-        />
-      )} */}
-      <Button
-        onClick={getStudents}
-        variant="contained"
-        sx={{ margin: "10px" }}
-      >
-        Take a Attendance
-      </Button>
-      <Grid item xs={12}>
         <Formik
           innerRef={formikRef}
           initialValues={currentRow}
-        // onSubmit={(values) => values}
+          onSubmit={(values) => values}        
         >
-          {(formik) => (
-            <Form>
-              <Grid item xs={12} sx={{ borderTop: "1px solid black" }}>
-                <Grid>
-                  <DialogTitle style={{ paddingBottom: "0px" }}>
-                    Attendance Sheet
-                  </DialogTitle>
-                  <div style={{ height: 300, width: "100%" }}>
-                    <DataGrid
-                      editMode="row"
-                      const
-                      rows={students.map((student, index) => ({ ...student, id: index + 1 }))}
-                      // rows={rows}
-                      columns={columns}
-                      css={css`
-                        height: calc(100vh - 1500px - 30px) !important;
-                      `}
-                      experimentalFeatures={{ newEditingApi: true }}
-                      hideFooter
-                    />
-                  </div>
-                </Grid>
-                <br />
+          {(formik) =>(
+          <Form>
+            <Grid
+              item
+              container
+              display="flex"
+              flexDirection="row"
+              spacing={2}
+              padding="1rem"
+              paddingTop=""
+            >
+            <Grid item md={2.4}>
+              <Typography>Select Any Branch</Typography>
+              <Select
+                control="select"
+                type="text"
+                fullWidth
+                name="branch"
+                value={formik.values.branch}
+                onChange={(e) => {
+                  formik.setFieldValue('branch',e.target.value)
+                  sendTaskRequest({url:`/getFacultySem/${e.target.value}`, method:"get"},(semester)=>{setSemCollection(semester)})
+                }}
+              >
+                {branchCollection.map((d) => {
+                  return <MenuItem value={d}>{d}</MenuItem>;
+                })}
+              </Select>
+            </Grid>
+            <Grid item md={2.4}>
+              <Typography>Select Sem</Typography>
+              <Select
+                control="select"
+                type="text"
+                fullWidth
+                name="semester"
+                value={formik.values.semester}
+                onChange={(e) => {
+                  formik.setFieldValue('semester',e.target.value)
+                  sendTaskRequest({url:`/subject/${formik.values.branch}/${e.target.value}`,method:"get"},(subject) => {setSubjectCollection(subject)})
+                }}
+              >
+                {semCollection?.map((d, i) => {
+                  return <MenuItem value={d}>{d}</MenuItem>;
+                })}
+              </Select>
+            </Grid>
+            <Grid item md={2.4}>
+              <Typography>Select Any Subject</Typography>
+              <Select
+                control="select"
+                type="text"
+                fullWidth
+                name="subject"
+                value={formik.values.subject}
+                onChange={(e) => { 
+                  formik.setFieldValue('subject',e.target.value)
+                }}
+              >
+                {subjectCollection?.map((d) => {
+                  return <MenuItem value={d}>{d}</MenuItem>;
+                })}
+              </Select>
+            </Grid>
+            <Grid item md={2.4} textAlign="left">
+              <Typography>Select Lecture No</Typography>
+              <TextField
+                name="lectureNo"
+                control="input"
+                type="number"
+                fullWidth
+                value={formik.values.lectureNo}
+                onChange={formik.handleChange}
+              />
+            </Grid>
+            <Grid item md={2.4}>
+              <Typography>Select Date</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={formik.values.date}
+                  name="date"
+                  onChange={(e)=> {
+                    formik.setFieldValue("date",`${e.$d.getMonth() + 1}-${e.$d.getDate()}-${e.$d.getFullYear()}`)
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
               </Grid>
-              <Button onClick={saveData} variant="contained">
-                Submit
+              <Button
+                onClick={onSubmit}
+                variant="contained"
+                sx={{ margin: "10px" }}
+              >
+              Take a Attendance
               </Button>
-            </Form>
+            </Grid>
+          </Form>
           )}
         </Formik>
       </Grid>
+
+    
+      {students.length > 0 && (<Grid item xs={12} sx={{ borderTop: "1px solid black" }}>
+        <Grid>
+          <DialogTitle style={{ paddingBottom: "0px" }}>
+            Attendance Sheet
+          </DialogTitle>
+          <div style={{ height: 300, width: "100%" }}>
+            <DataGrid
+              editMode="row"
+              const
+              rows={students.map((student, index) => ({ ...student, id: index + 1 }))}
+              // rows={rows}
+              columns={columns}
+              css={css`
+                height: calc(100vh - 1500px - 30px) !important;
+              `}
+              experimentalFeatures={{ newEditingApi: true }}
+              hideFooter
+            />
+          </div>
+        </Grid>
+        <br />
+        <Button onClick={saveData} variant="contained">
+        Submit
+        </Button>
+      </Grid>)
+      }
     </>
   );
 };

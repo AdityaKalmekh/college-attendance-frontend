@@ -18,86 +18,70 @@ import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
 import { createAllocation, updateAllocation } from "../../api/allocation";
 import { getFaculty } from "../../api/faculty";
-import { getbranchName, getSem, getSubject, getId, getAllSubjects } from "../../api/Branch";
+import { getbranchName, getSem, getSubject, getId, getNonAllocatedSubjects } from "../../api/Branch";
 import { useState, useEffect } from "react";
+import useHttp from "../../hooks/useHttp";
 
-const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
+const AllocationDialog = ({ open, onCancel, loadData, currentRow,addNewAllocation,reloadAfterUpdation }) => {
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [branchCollection, setBranchCollection] = useState([]);
   const [semCollection, setSemCollection] = useState([]);
   const [subjectCollection, setSubjectCollection] = useState([]);
-  const [allocatedFacuty, setAllocatedFacuty] = useState();
-  const [allocatedbranch, setallocatedbranch] = useState();
-  const [allocatedSemester, setAllocatedSemester] = useState();
-  const [allocatedSubject, setAllocatedsubject] = useState();
   const [id,setId] = useState();
-  let fName;
-  // console.log({ branchCollection });
-  // console.log({facultyCollection});
-  console.log({ semCollection });
-  console.log({subjectCollection});
-  const loadDataForFaculty = () => {
-    // setAllocatedFacuty(currentRow.facultyName);
-    // setAllocatedFacuty(currentRow.facultyName);
-    // setAllocatedSemester(currentRow.semester);
-    // setAllocatedsubject(currentRow.subject);
-    // setallocatedbranch(currentRow.branch);
-    getFaculty().then(setFacultyCollection);
-    getbranchName().then(setBranchCollection);
-    getSem(currentRow.branch).then(setSemCollection);
-    getAllSubjects(currentRow.branch,currentRow.semester).then(setSubjectCollection);
-    setId(currentRow.facultyId)
-    // getSubject(currentRow.subject).then(setSubjectCollection);
-  };
 
-  const editFaculty = () =>{
-    setAllocatedFacuty(currentRow.facultyName);
-  }
-  console.log({subjectCollection});
-
+  const {error,sendRequest : sendTaskRequest} = useHttp();
+  
   useEffect(() => {
-    editFaculty()
-  },[]);
-
-  useEffect(() => {
-    loadDataForFaculty();
-  }, []);
+    sendTaskRequest({url:"/getFaculty",method:"get"},(data)=>{setFacultyCollection(data)})
+    sendTaskRequest({url:"/branch",method:"get"},(branch)=>{setBranchCollection(branch)})
+    if (currentRow._id !== ""){
+      sendTaskRequest({url:`/semester/${currentRow.branch}`,method:"get"},(semester)=>{setSemCollection(semester)})
+      sendTaskRequest({url:`/getNonAllocatedSubjects/${currentRow.facultyId}/${currentRow.branch}/${currentRow.semester}/${currentRow.subject}`,method:"get"},(subject)=>{setSubjectCollection(subject)})
+      setId(currentRow.facultyId)
+    }
+  },[sendTaskRequest,currentRow]);
+   
   
   const formikRef = useRef();
+  const reloadCreateData = (values, id) => {
+    if (id){
+      addNewAllocation(values)
+    }
+  }
 
-  const branchHandler = (e) => {
-    console.log(e.target.value);
-    setallocatedbranch(e.target.value);
-    getSem(e.target.value).then(setSemCollection);
-  };
-
-  const facultyHandler = (e) => {
-    setAllocatedFacuty(e.target.value);
-    getId(e.target.value);
-  };
-
-  // console.log({ allocatedFacuty });
+  const reloadEditData = (values,acknowledgment) => {
+    if (acknowledgment){
+      reloadAfterUpdation(values)
+    }
+  }
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
       console.log(values);
-      if (values) {
-        if (currentRow.id) {
-          updateAllocation({...values,facultyId : id})
-          toast.success("Faculty Allocation updated successfully");
-        } else {
-          createAllocation({
-            ...values,
-            id : id
-          });
-          toast.success("Faculty Allocation created successfully");
+      if (values){
+        console.log({currentRow});
+        if (currentRow._id){  
+          sendTaskRequest({
+            url : '/editAllocation',
+            method :'put',
+            data : {...values,facultyId:id}
+          },reloadEditData.bind(null,values))
+        }else{
+          sendTaskRequest({
+            url : '/addAllocation',
+            method : 'post',
+            data : {...values,id:id}
+          },reloadCreateData.bind(null,values))
         }
-        onCancel();
-        loadData();
+        onCancel()
       }
     });
   };
-  console.log(currentRow);
+
+  if (error){
+    console.error(error);
+  }
+
   return (
     <>
       <Dialog fullWidth open={open} onClose={onCancel}>
@@ -116,16 +100,13 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                   <FormControl fullWidth>
                     <InputLabel id="facultyName">Select Faculty</InputLabel>
                     <Select
-                      // labelId="fname"
-                      id="facultyName"
-                      // option={facultyCollection}
-                      // defaultValue={facultyCollection[0]}
-                      // value={formik.values.facultyName}
+                      control="select"
+                      type="text"
+                      name="facultyName"
                       value={formik.values.facultyName}
                       onChange={(e) => {
-                        formik.values.facultyName = e.target.value
-                        setAllocatedFacuty(e.target.value);
-                        getId(e.target.value).then(setId);
+                        formik.setFieldValue('facultyName',e.target.value)
+                        sendTaskRequest({url:`/id/${e.target.value}`,method:"get"},(facultyId)=>{setId(facultyId)})
                       }}
                     >
                       {facultyCollection?.map((d, i) => {
@@ -140,13 +121,13 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <FormControl fullWidth>
                       <InputLabel id="branch">Select Branch</InputLabel>
                       <Select
-                        labelId="branch"
-                        id="branch"
+                        control="select"
+                        type="text"
+                        name="branch"
                         value={formik.values.branch}
                         onChange={(e) =>{
-                          formik.values.branch = e.target.value
-                          setallocatedbranch(e.target.value);
-                          getSem(e.target.value).then(setSemCollection);
+                          formik.setFieldValue('branch',e.target.value)
+                          sendTaskRequest({url:`/semester/${e.target.value}`,method:"get"},(semester) => {setSemCollection(semester)})
                         }}
                       >
                         {branchCollection?.map((d) => {
@@ -160,12 +141,13 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                     <FormControl fullWidth>
                       <InputLabel id="semester">Select Semester</InputLabel>
                       <Select
-                        id="semester"
+                        control="select"
+                        type="text"
+                        name="semester"
                         value={formik.values.semester}
                         onChange={(e) => {
-                          formik.values.semester = e.target.value
-                          setAllocatedSemester(e.target.value)
-                            getSubject(allocatedbranch,e.target.value).then(setSubjectCollection);
+                          formik.setFieldValue('semester',e.target.value)
+                          sendTaskRequest({url:`/subject/${formik.values.branch}/${e.target.value}`,method:"get"},(subject)=>{setSubjectCollection(subject)})
                         }}
                       >
                         {semCollection?.map((d, i) => {
@@ -177,15 +159,14 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow }) => {
                   <br />
                   <Grid item xs={12} textAlign="left">
                     <FormControl fullWidth>
-                      <InputLabel id="fname">Select Subject</InputLabel>
+                      <InputLabel id="subject">Select Subject</InputLabel>
                       <Select
-                        labelId="fname"
-                        id="subject"
+                        control="select"
+                        type="text"
+                        name="subject"
                         value={formik.values.subject}
                         onChange={(e) => {
-                          formik.values.subject = e.target.value
-                          console.log(e.target.value);
-                          setAllocatedsubject(e.target.value);
+                          formik.setFieldValue("subject",e.target.value);
                         }}
                       >
                         {subjectCollection?.map((d) => {

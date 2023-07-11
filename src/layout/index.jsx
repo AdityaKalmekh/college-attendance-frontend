@@ -28,7 +28,7 @@ const AppLayout = () => {
           p: 1,
         }}
       >
-        <Content />
+      <Content />
       </Box>
       <Footer />
     </>

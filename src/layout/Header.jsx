@@ -73,7 +73,8 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-const DRAWER_ITEMS = [
+
+const AdminDRAWER_ITEMS = [
   {
     route: "/users",
     literal: "Users",
@@ -102,47 +103,57 @@ const DRAWER_ITEMS = [
   },
 
   {
-    route: "/Attendance",
-    literal: "AttendenceCollection",
-    Icon: AutoStoriesIcon,
-  },
-
-  {
     route: "/graph",
     literal: "Graph",
     Icon: QueryStatsIcon,
   },
+
+  {
+    route: "/report",
+    literal: "report",
+    Icon: QueryStatsIcon,
+  },
+
 ];
 
-const mainListItems = (
-  <>
-    {DRAWER_ITEMS.map(({ route, literal, Icon }) => (
-      <Link
-        to={route}
-        key={literal}
-        css={{ textDecoration: "none", color: "black" }}
-      >
-        <ListItemButton
-          classes={{
-            root: { background: "red" },
-            selected: { background: "green" },
-          }}
-        >
-          <ListItemIcon>
-            <Icon />
-          </ListItemIcon>
-          <ListItemText primary={literal} />
-        </ListItemButton>
-      </Link>
-    ))}
-  </>
-);
+const FacultyDrawer_Item = [
+  {
+    route: "/Attendance",
+    literal: "AttendenceCollection",
+    Icon: AutoStoriesIcon,
+  },
+]
+
+
 const Header = () => {
   const { isDrawerOpened, toggleDrawer } = useLayoutContext();
 
   const { user, logout } = useAuthContext();
-
+  const DRAWER_ITEMS = user === "faculty" ? FacultyDrawer_Item : AdminDRAWER_ITEMS;
   // const [open, setOpen] = useState(false);
+  const mainListItems = (
+    <>
+      {DRAWER_ITEMS.map(({ route, literal, Icon }) => (
+        <Link
+          to={route}
+          key={literal}
+          css={{ textDecoration: "none", color: "black" }}
+        >
+          <ListItemButton
+            classes={{
+              root: { background: "red" },
+              selected: { background: "green" },
+            }}
+          >
+            <ListItemIcon>
+              <Icon />
+            </ListItemIcon>
+            <ListItemText primary={literal} />
+          </ListItemButton>
+        </Link>
+      ))}
+    </>
+  );
 
   return (
     <Box>

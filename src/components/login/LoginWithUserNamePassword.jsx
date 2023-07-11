@@ -3,10 +3,15 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { Button, Typography } from "@mui/material";
 import FormikController from "../../formik/FormikController";
-import { loginWithEmailAndPassword } from "../../api/auth";
 import { loginButtonWidth } from "./loginStyles";
+import useHttp from "../../hooks/useHttp";
+import AuthContext from "../../context/AuthContext";
+import { useContext } from "react";
 
 const LoginWithUserNamePassword = () => {
+  const authctx = useContext(AuthContext);
+
+  const { sendRequest } = useHttp();
   const initialValues = {
     email: "",
     password: "",
@@ -16,15 +21,31 @@ const LoginWithUserNamePassword = () => {
     password: Yup.string().required("Required"),
   });
 
+
   const onSubmit = (values, { resetForm }) => {
+
     if (values) {
-      loginWithEmailAndPassword(values)
-        .then(() => {
-          resetForm();
-        })
-        .catch((err) => {
-          toast.error(err.message);
-        });
+      sendRequest({
+        url : "/checkEmail",
+        method : "post",
+        data : values
+      },(data) => {if (data.length > 0)  
+                    {
+                      authctx.userHandler(data[0].role)
+                      authctx.onLogin()
+                      authctx.idHandler(data[0].facultyId)
+                    } else {
+                      console.log("user not exist")}
+                  })
+      // setTimeout(() => {console.log(authctx.user)},5000);
+      // console.log(authctx.user);
+      // LoginWithEmailAndPassword(values)
+      //   .then(() => {
+      //     resetForm();
+      //   })
+      //   .catch((err) => {
+      //     toast.error(err.message);
+      //   });
     } else {
       toast.error("Something went wrong");
     }

@@ -25,31 +25,18 @@ import FormikController from "../../formik/FormikController";
 const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,resetAfterUpdation }) => {
   const [viewBranch, setViewBranch] = useState([]);
   const [viewSem, setSem] = useState([]);
-  const [selectedSem, setSelectedSem] = useState();
-  const [selectedBranch, setSelectedBranch] = useState();
-  console.log({ viewBranch });
-
-  const loadBranchData = () => {
-    getbranchName().then(setViewBranch);
-    setSelectedBranch(currentRow.course);
-  };
+  const {error,sendRequest: sendTaskRequest} = useHttp();
   
-  // console.log({selectedBranch});
-  const loadSemData = () => {
-    getSem(currentRow.course).then(setSem).catch(err =>{console.log(err);});
-  }
-
   useEffect(() => {
-    loadSemData();
-  }, []);
-
-  useEffect(() => {
-    loadBranchData();
-  }, []);
+    sendTaskRequest({url:"/branch",method:"get"},(branch)=>{setViewBranch(branch)})
+    if (currentRow._id !== ""){
+      sendTaskRequest({url:`/semester/${currentRow.course}`,method:"get"},(semester)=>setSem(semester))
+    }
+  },[sendTaskRequest,currentRow]);
 
   const reloadCreateData = (values, id) => {
     if (id){
-      addGetNewStudent(values)
+      addGetNewStudent({...values,_id:id})
     }
   }
 
@@ -59,10 +46,7 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
     }
   }
 
-  // console.log({viewSem});
-
   const formikRef = useRef();
-  const {sendRequest: sendTaskRequest} = useHttp();
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
@@ -75,26 +59,21 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
             method: 'put',
             data : values
           },reloadEditData.bind(null,values))
-          // updateStudent({
-          //   ...values,
-          //   // course: selctedBranch,
-          // }).then(loadData);
         } else {
-          // createStudent({
-          //   ...values,
-          //   // course: selctedBranch,
-          // }).then(loadData)
-            sendTaskRequest({
-              url : '/addStudents',
-              method : 'post',
-              data : values
-            },reloadCreateData.bind(null,values));
+          sendTaskRequest({
+            url : '/addStudents',
+            method : 'post',
+            data : values
+          },reloadCreateData.bind(null,values));
         }
         onCancel();
-        // loadData();
       }
     });
   };
+
+  if (error){
+    console.log(error);
+  }
 
   return (
     <>
@@ -197,18 +176,12 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
                       <Select
                         control = "select"
                         type = "text"
-                        label = "Select Branch"
                         name = "course"
                         value={formik.values.course}
                         onChange={(e) =>{
-                          // const courseId = e.target.value;
-                          // getSem(viewBranch.find((c) => (c === courseId)));
-
-                          // // setViewBranch(viewBranch.find((branch) => branch === e.target.value))
-                          // formik.handleChange(e);
-                          formik.values.course = e.target.value;
-                          getSem(e.target.value).then(setSem);
-                          setSelectedBranch(e.target.value);
+                          formik.setFieldValue('course',e.target.value)
+                          sendTaskRequest({url:`/semester/${e.target.value}`,method:"get"},(semester)=>setSem(semester))
+                          // getSem(e.target.value).then(setSem);
                         }}>
                         {viewBranch?.map((d) => {
                           return <MenuItem value={d}>{d}</MenuItem>;
@@ -220,13 +193,15 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
                   <br />
                   <Grid item xs={12} md={6}>
                     <FormControl fullWidth>
-                      <InputLabel id="branch">Select Semester</InputLabel>
+                      <InputLabel id="sem">Select Semester</InputLabel>
                       <Select
+                        control="select"
+                        type="text"
+                        name="sem"
                         value={formik.values.sem}
                         onChange={(e) => {
-                          formik.values.sem = e.target.value;
-                          setSelectedSem(e.target.value);
-                         }}
+                          formik.setFieldValue('sem',e.target.value)
+                        }}
                       >
                         {viewSem?.map((d) => {
                           return <MenuItem value={d}>{d}</MenuItem>;

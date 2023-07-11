@@ -1,7 +1,6 @@
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
-import { getFaculty, deletefacultyData } from "../../api/faculty";
 import FacultyDialog from "./AddFacultyDailoge";
 import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
@@ -21,13 +20,14 @@ const FacultyCollection = () => {
     qulification: "",
     experience: "",
     expertise: "",
+    email:"",
+    password:""
   };
 
   const {error, sendRequest : fetchTasks} = useHttp();
 
   const loadData = (data) => {
-    console.log(data.faculty);
-    setFacultyCollection(data.faculty);
+    setFacultyCollection(data);
   };
 
   const resetAfterDelection = (id,taskData) => {
@@ -38,18 +38,22 @@ const FacultyCollection = () => {
     }
   }
 
-  const reloadNewData  = (student) => {
+  const reloadNewData  = (faculty,id) => {
     toast.success("Faculty Added Sucessfully");
-    setFacultyCollection((prev) => prev.concat(student));
+    setFacultyCollection((prev) => prev.concat(faculty));
+
+    fetchTasks({
+      url : "/addUser",
+      method : "post",
+      data : {"facultyId":id,"email":faculty.email,"password":faculty.password,"role":"faculty"}
+    },(id)=>{if (id){
+      return
+    }else {console.log(error)}})
   }
 
   useEffect(() => {
     fetchTasks({url:'/getFaculty',method:'get'},loadData);
   },[fetchTasks]);
-
-  // useEffect(() => {
-  //   loadData();
-  // }, []);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -86,6 +90,10 @@ const FacultyCollection = () => {
     });
     setOpen(true);
   };
+
+  if (error){
+    console.log({error});
+  }
 
   const columns = [
     { field: "id", headerName: "SR.", width: 50 },

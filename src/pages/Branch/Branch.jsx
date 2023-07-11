@@ -19,12 +19,11 @@ const BranchCollection = () => {
   let branchContainer = [];
 
   const initialValues = {
+    _id: "",
     branchname: "",
-    totalsem: "",
-    semesters: "",
+    semesters: [],
   };
   // let dt = [];
-  console.log({ branchArray });
 
   // const displayData = (item) => {
   //   const bname = item?.branch_name;
@@ -52,6 +51,10 @@ const BranchCollection = () => {
     getBranch().then(setBranchCollection);
   };
 
+  const addNewBranch = (newBranch) => {
+    console.log({newBranch});
+    setBranchCollection(prev => prev.concat(newBranch))
+  }
   console.log({branchCollection});
   
   useEffect(() => {
@@ -86,10 +89,10 @@ const BranchCollection = () => {
     console.log(row);
     event.stopPropagation();
     setCurrentRow({
+      _id : row._id ? row._id : "",
       branchname: row.branchname ? row.branchname : "",
       totalsem: row.totalsem ? row.totalsem : "",
-      subject: row.subject ? row.subject : "",
-      firebaseId: row.firebaseId,
+      semesters: row.semesters ? row.semesters : "",
     });
     setOpen(true);
   };
@@ -139,6 +142,7 @@ const BranchCollection = () => {
           handleClickClose={handleClickClose}
           loadData={loadData}
           currentRow={currentRow}
+          addNewBranch={addNewBranch}
         />
       )}
       <Button
@@ -151,14 +155,17 @@ const BranchCollection = () => {
       <div style={{ height: 475, width: "100%" }}>
         <DataGrid
           editMode="row"
-          rows={branchCollection?.map((branch, index) => {
-            console.log({sem : branch.semesters.length});
-            return ({
-              branchname : branch.branchname,
-              totalsem : branch.semesters.length,
-              id : index + 1
-            })
-          }
+          rows={branchCollection?.map((branch, index) => ({
+            ...branch,
+            totalsem : branch.semesters.length,
+            id : index+1
+            // return ({
+            //   branchname : branch.branchname,
+            //   totalsem : branch.semesters.length,
+            //   semester : branch.semesters,
+            //   id : index + 1
+            // })
+          })
             
           //   ({
           //   ...branch,

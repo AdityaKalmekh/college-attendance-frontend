@@ -9,26 +9,49 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from "react-toastify";
+import useHttp from "../../hooks/useHttp";
 
 const AllocationCollection = () => {
   const [open, setOpen] = useState(false);
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
+  const {sendRequest : sendTaskRequest} = useHttp();
 
   const initialValues = {
+    _id : "",
     facultyName: "",
     branch: "",
     semester: "",
     subject: "",
   };
 
-  const loadData = () => {
-    getAllocation().then(setFacultyCollection);
+  const addNewAllocation = (newAllocation) => {
+    setFacultyCollection((prev) => prev.concat(newAllocation))
+  }
+
+  const reloadAfterDeletion = (id,acknowledgment) => {
+    console.log(acknowledgment);
+    if (acknowledgment){
+      toast.success("Allocated Faculty Delete Sucessfully");
+      const indexDelete = facultyCollection.findIndex(faculty => faculty._id === id)
+      setFacultyCollection(prev => prev.filter((_,index) => index !== indexDelete))
+    }
+  }
+
+  const reloadAfterUpdation = (data) => {
+      const indexEdit = facultyCollection.findIndex(faculty => faculty._id === data._id)
+      facultyCollection[indexEdit] = data
+      setFacultyCollection([...facultyCollection])
+  }
+
+  console.log(facultyCollection);
+  const loadData = (data) => {
+    setFacultyCollection(data);
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    sendTaskRequest({url:"/getAllocation",method:"get"},loadData)
+  }, [sendTaskRequest]);
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -42,17 +65,16 @@ const AllocationCollection = () => {
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      console.log(row);
-      deleteallocationData(row).then(loadData);
+      sendTaskRequest({url:"/deleteAllocation",method:"delete",id:row._id},reloadAfterDeletion.bind(null,row._id))
+      // deleteallocationData(row).then(loadData);
     }
-    toast.warning("Allocated Faculty Delete Sucessfully");
   };
   
   const handleEditClick = (row) => (event) => {
     event.stopPropagation();
     setCurrentRow({
       facultyId : row.facultyId ? row.facultyId : "",
-      id: row._id ? row._id : "",
+      _id: row._id ? row._id : "",
       facultyName: row.facultyName ? row.facultyName : "",
       branch : row.branch ? row.branch : "",
       semester : row.semester ? row.semester : "",
@@ -107,6 +129,8 @@ const AllocationCollection = () => {
           onCancel={handleClickClose}
           loadData={loadData}
           currentRow={currentRow}
+          addNewAllocation={addNewAllocation}
+          reloadAfterUpdation={reloadAfterUpdation}
         />
       )}
       <Button

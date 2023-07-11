@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { deletestuentData } from "../../api/student";
 import AddMultipleStudents from "./AddMultipalStudent";
 import useHttp from "../../hooks/useHttp";
 
@@ -36,13 +35,11 @@ const StudentCollection = () => {
     setStudentCollection(data.studentData);
   };
 
-  // const loadData = () => {  
-  //   getStudent().then(setStudentCollection);
-  // };
-
   const addGetNewStudent = (student) => {
     setStudentCollection((prev) => prev.concat(student));
   }
+
+  console.log({studentCollection});
 
   const resetAfterDelection = (id,taskData) => {
     if (taskData){
@@ -51,6 +48,10 @@ const StudentCollection = () => {
     }
   }
 
+  if (error){
+    console.error({error});
+  }
+  
   const resetAfterUpdation = (data,acknowledged) => {
     if (acknowledged){
       const indexEdit = studentCollection.findIndex(student => student._id === data._id)
@@ -62,10 +63,6 @@ const StudentCollection = () => {
   useEffect(() => {
      fetchTasks({url:'/getStudents',method:'get'},loadData);
   }, [fetchTasks]);
-
-  // useEffect(() =>{
-  //   loadData()
-  // },[])
 
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
@@ -87,12 +84,12 @@ const StudentCollection = () => {
   const handleDeleteClick = (row) => (event) => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
-      // deletestuentData(row).then(loadData);
        fetchTasks({url:'/deleteStudent',method:"delete",id:row._id},resetAfterDelection.bind(null,row._id))
     }
   };
   
   const handleEditClick = (row) => (event) => {
+    console.log(row);
     console.log(row._id)
     event.stopPropagation();
     setCurrentRow({

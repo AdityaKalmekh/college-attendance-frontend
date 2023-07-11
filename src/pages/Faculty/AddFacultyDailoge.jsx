@@ -11,17 +11,17 @@ import { toast } from "react-toastify";
 import * as React from "react";
 import { useRef } from "react";
 import { Form, Formik } from "formik";
-import { createFaculty, updateFaculty } from "../../api/faculty";
 import useHttp from "../../hooks/useHttp";
 
 const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, reloadAfterUpdation }) => {
   const formikRef = useRef();
 
-  const {sendRequest : sendTaskRequest} = useHttp();
+  const {error,sendRequest : sendTaskRequest} = useHttp();
 
   const reloadCreateData = (values, id) => {
     if (id){
-      reloadNewData(values)
+      console.log({values});
+      reloadNewData(values,id)
     }
   }
 
@@ -33,8 +33,6 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, re
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
-      console.log({values});
-      console.log({currentRow});
       if (values){
         if (currentRow._id){
           sendTaskRequest({
@@ -44,30 +42,27 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, re
           },reloadEditData.bind(null,values))
         }else{
           sendTaskRequest({
-            url : "/addFaculty",
+            url : "/checkEmail",
             method : "post",
-            data : values
-          },reloadCreateData.bind(null,values))
+            data : {"email": values.email}
+          }, (data) => {if (data){
+            toast.error("Email already exists")
+          }else{
+            sendTaskRequest({
+              url : "/addFaculty",
+              method : "post",
+              data : values
+            },reloadCreateData.bind(null,values))
+          }})
         }
         onCancel()
       }
-      // if (values) {
-      //   if (currentRow.id) {
-      //     updateFaculty({
-      //       ...values,
-      //     });
-      //     toast.success("Faculty updated successfully");
-      //   } else {
-      //     createFaculty({
-      //       ...values,
-      //     });
-      //     toast.success("Faculty created successfully");
-      //   }
-      //   onCancel();
-      //   loadData();
-      // }
     });
   };
+
+  if (error){
+    console.log({error});
+  }
 
   return (
     <>
@@ -156,6 +151,43 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, re
                     />
                   </Grid>
                   <br />
+                  <Grid item xs={12} textAlign="left">
+                    <TextField
+                      control="input"
+                      type="text"
+                      label="Email"
+                      name="email"
+                      fullWidth
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      error={
+                        formik.touched.expertise &&
+                        Boolean(formik.errors.expertise)
+                      }
+                      helperText={
+                        formik.touched.expertise && formik.errors.expertise
+                      }
+                    />
+                  </Grid>
+                  <br/>
+                  <Grid item xs={12} textAlign="left">
+                    <TextField
+                      control="input"
+                      type="text"
+                      label="Password"
+                      name="password"
+                      fullWidth
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      error={
+                        formik.touched.expertise &&
+                        Boolean(formik.errors.expertise)
+                      }
+                      helperText={
+                        formik.touched.expertise && formik.errors.expertise
+                      }
+                    />
+                  </Grid>
                   <Button onClick={onSubmit} variant="contained" type="submit">
                     Submit
                   </Button>

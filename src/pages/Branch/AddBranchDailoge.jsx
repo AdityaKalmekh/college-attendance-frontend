@@ -2,12 +2,13 @@ import { Grid, Button, Typography, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 import Modal from "../../common/Modal";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import useProgress from "../../hooks/useProgress";
-import { Form, Formik } from "formik";
+import { Form, Formik,FieldArray } from "formik";
 import Loading from "../../common/Loader";
 import FormikController from "../../formik/FormikController";
 import { createBranch, updateBranch } from "../../api/Branch";
+import useHttp from "../../hooks/useHttp";
 // import { Subject } from "@mui/icons-material";
 
 const BranchDailog = ({
@@ -16,6 +17,7 @@ const BranchDailog = ({
   onCancel,
   loadData,
   currentRow,
+  addNewBranch  
 }) => {
   const formikRef = useRef();
   const input = useRef();
@@ -27,14 +29,28 @@ const BranchDailog = ({
   // const [semesters, setSemesters] = useState([]);
   const [counter, setCounter] = useState([]);
   const [container, setcontainer] = useState([]);
+  const {error, sendRequest : sendTaskRequest} = useHttp();
   // const [totalsem, setTotalsem] = useState();
-  
+  let subIntex = 0;
   //aditya's branch code 
 
   let sub = [];
   const [subject,setSubject] = useState([]);
   const [subSem,setSubsem] = useState([]);
+  const [editAbleSubject,setEditAbleSubject] = useState([])
+  const [editAbleText,setEditAbleText] = useState()
 
+  const reloadCreateData = (values,id) => {
+    if (id){
+      addNewBranch(values)
+    }
+  }
+
+  useEffect(() => {
+    setbranch(currentRow.branchname) 
+    setTotalSemValues(currentRow.semesters.map(semester => { return semester.sem})) 
+  },[currentRow])
+  
   const onOk = () => {
     subSem.forEach((item) => {
       let subjects = []
@@ -64,13 +80,37 @@ const BranchDailog = ({
           handleClickClose();
         });
       } else {
-        createNewBranch(branchContainer).then(() => {
-          toast.success("Branch created successfully");
-          handleClickClose();
-        });
+        sendTaskRequest({
+            url:"/addBranch",
+            method:"post",
+            data:branchContainer},reloadCreateData.bind(null,branchContainer))
+            handleClickClose();
+        // createNewBranch(branchContainer).then(() => {
+        //   toast.success("Branch created successfully");
+        //   handleClickClose();
+        // });
       }
     }
   };
+
+  const onSubmit = () => {
+    formikRef.current.submitForm().then((values) => {
+      if (values){
+        if (currentRow._id){
+
+        }else{
+          sendTaskRequest({
+            url : "/addBranch",
+            method : "post",
+            data : values
+          },reloadCreateData.bind(null,values))
+          handleClickClose();
+        }
+      }
+      console.log({values});
+    })
+  }
+
   console.log({
     addBranchOption: totalSemvalues?.map((option) => ({
       value: option,
@@ -78,53 +118,7 @@ const BranchDailog = ({
     })),
   });
 
-  const handleFinalSubmit = () => {
-    if (sub.length !== 0){
-      setSubject(prev => {
-        return [...prev,{"sem":currentsem,"subject":sub[0]}]
-      })
-    }
-    
-    // console.log({ finalContainer: container });
-    // const filterContainer = container.filter((d) => {
-    //   if (!d == undefined) {
-    //     return d;
-    //   }
-    // });
-    // console.log({ filterContainer });
-    // setSemesters((prev) => {
-    //   return [
-    //     ...prev,
-    //     {
-    //       branchname: branch,
-    //       sem_name: currentsem,
-    //       subject: filterContainer,
-    //     },
-    //   ];
-    // });
-    // setcontainer([]);
-  };
-  // console.log({ semesters });
   console.log(subject);
-
-  const handleClick = () => {
-    // subtemp.push({"subject":sub[0],"sem":currentsem});
-    if (sub.length !== 0){
-      setSubject(prev => {
-        return [...prev,{"sem":currentsem,"subject":sub[0]}]
-      })
-    }
-    sub = [];
-    if (counter.length === 0) {
-      console.log("s2");
-      const d = [];
-      d.push(0);
-      setCounter(d);
-    } else {
-      const d = counter.length + 1;
-      setCounter([...counter, d]);
-    }
-  };
 
   const addSubject = (index) => (e) => {
     let subject = e.target.value;
@@ -134,46 +128,18 @@ const BranchDailog = ({
       sub.pop();
       sub.push(subject);
     }
-    // const containerCopy = [...container];
-    // containerCopy[index] = e.target.value;
-    // setcontainer(containerCopy);
-    // containerCopy?.filter(item => item !== undefined && item !== null)
-    // console.log({containerCopy});
   };
-
-  const handleTotalSem = (e) => {
-    // setTotalsem(e.target.value);
-    let arr = [];
-    for (let i = 1; i <= e.target.value; i++) {
-      arr.push(i);
-      setSubsem(prev => {
-        return ([...prev,{"sem":i,"subject":[]}])
-      })
-    }
-    setTotalSemValues(arr);
-  };
-  // console.log(subSem);
-
+  
   const handleSelectedSem = (e) => {
     setcurrentsem(e.target.value);
-  };
-
-  const branchHandler = (e) => {
-    const currentb = e.target.value;
-    setbranch(currentb);
-  };
-
-  const handleShowandClear = () => {
-    let clr = [...counter];
-    input.current.reset();
-    clr.forEach((d, i) => {
-      // eslint-disable-next-line eqeqeq
-      if (d == -111) {
-      } else {
-        clr[i] = -111;
-      }
-    });
-    setCounter(clr);
+    // if (currentRow._id !== ""){
+    //   currentRow.semesters.forEach(semester =>{
+    //     if (semester.sem === e.target.value){
+    //       // console.log(currentRow.semesters[e.target.value -1].subject);
+    //       setEditAbleSubject(currentRow.semesters[e.target.value -1].subject);
+    //     }
+    //   })
+    // }
   };
 
   const deletedInput2 = (index) => {
@@ -182,10 +148,12 @@ const BranchDailog = ({
     console.log({ deleted: d });
     setCounter(d);
   };
+
+  console.log({currentRow});
   return (
     <Modal
       title={currentRow._id ? "Update Branch" : "Create Branch"}
-      onOk={onOk}
+      onOk={onSubmit}
       fullScreen
       onCancel={handleClickClose}
       sx={{ minHeight: (createLoading || updateLoading) && "200px" }}
@@ -208,6 +176,9 @@ const BranchDailog = ({
           >
             {(formik) => (
               <Form>
+                <FieldArray
+                name="semesters"
+                render={arrayHelpers => (
                 <Grid
                   container
                   display="flex"
@@ -224,10 +195,10 @@ const BranchDailog = ({
                         control="input"
                         type="text"
                         label="Branch Name"
-                        // name="bname"
+                        name="branchname"
                         fullWidth
-                        value={branch}
-                        onChange={branchHandler}
+                        value={formik.values.branchname}
+                        onChange={formik.handleChange}
                       />
                     </Grid>
                     <Grid item xs={12} textAlign="left" paddingTop="1rem">
@@ -236,8 +207,13 @@ const BranchDailog = ({
                         type="number"
                         label="Total Sem"
                         // name="tsem"
+                        value={formik.values.semesters.length > 0 ? formik.values.semesters.length: null}
                         fullWidth
-                        onChange={handleTotalSem}
+                        onChange={(e) => {
+                          for (let i = 1; i <= e.target.value; i++) {
+                            arrayHelpers.push({"sem":i,"subject":[]})
+                          }
+                        }}
                       />
                     </Grid>
                     <Grid item xs={12} textAlign="left" paddingTop="1rem">
@@ -246,9 +222,9 @@ const BranchDailog = ({
                         type="nember"
                         label="Select Sem For Subject"
                         fullWidth
-                        options={totalSemvalues?.map((option) => ({
-                          value: option,
-                          label: option,
+                        options={formik.values.semesters.map((option) => ({
+                          value: option.sem,
+                          label: option.sem,
                         }))}
                         onChange={handleSelectedSem}
                       />
@@ -274,6 +250,71 @@ const BranchDailog = ({
                     <form ref={input}>
                       <Grid item md={6}>
                         {/* {Array.from(Array(counter)).map((c, index) => { */}
+                        {/* {currentsem ? currentRow.semesters[currentsem-1].subject.map((subject,index) =>{
+                          return (
+                            <div>
+                              <TextField
+                                    id={index}
+                                    // ref={input}
+                                    fullWidth
+                                    sx={{
+                                      marginTop: "1rem",
+                                      marginLeft: ".5rem",
+                                    }}
+                                    value={editAbleText}
+                                    defaultValue={subject}
+                                    className={index}
+                                    type="text"
+                                    onChange={(e) => {
+                                        setEditAbleText(e.target.value)
+                                    }}
+                                  />
+                                  <Button
+                                    sx={{ margin: "1rem" }}
+                                    size="small"
+                                    variant="contained"
+                                    onClick={() => {
+                                      deletedInput2(index);
+                                    }}
+                                  >
+                                    delete
+                                  </Button>
+                            </div>
+                          )
+                        }):null} */}
+                        {/* {editAbleSubject.length > 0 ?
+                          editAbleSubject.map((subject,index) => {
+                            return (
+                              <div>
+                                <TextField
+                                      id={index}
+                                      // ref={input}
+                                      fullWidth
+                                      sx={{
+                                        marginTop: "1rem",
+                                        marginLeft: ".5rem",
+                                      }}
+                                      value={editAbleText}
+                                      defaultValue={subject}
+                                      className={index}
+                                      type="text"
+                                      onChange={(e) => {
+                                          setEditAbleText(e.target.value)
+                                      }}
+                                    />
+                                    <Button
+                                      sx={{ margin: "1rem" }}
+                                      size="small"
+                                      variant="contained"
+                                      onClick={() => {
+                                        deletedInput2(index);
+                                      }}
+                                    >
+                                      delete
+                                    </Button>
+                              </div>
+                            )
+                          }): null} */}
                         {counter.length > 0
                           ? counter?.map((c, index) => {
                               if (c === -111) {
@@ -284,7 +325,6 @@ const BranchDailog = ({
                                   <TextField
                                     // id={`id${index}`}
                                     // ref={input}
-
                                     fullWidth
                                     sx={{
                                       marginTop: "1rem",
@@ -313,26 +353,57 @@ const BranchDailog = ({
                     </form>
 
                     <Grid item sx={{ paddingTop: ".5rem" }}>
-                      <Button variant="contained" onClick={handleClick}>
+                      <Button variant="contained" onClick={() => {
+                        if (sub.length !== 0){
+                          formik.values.semesters[currentsem-1].subject.push(sub[0])
+                        }
+                        sub = [];
+                        if (counter.length === 0) {
+                          console.log("s2");
+                          const d = [];
+                          d.push(0);
+                          setCounter(d);
+                        } else {
+                          const d = counter.length + 1;
+                          setCounter([...counter, d]);
+                        }
+                      }}>
                         +
                       </Button>
-                      <Button
+                      {/* <Button
                         sx={{ marginLeft: "1rem" }}
                         variant="contained"
                         onClick={handleShowandClear}
                       >
                         Reset Subject Field
-                      </Button>
+                      </Button> */}
                       <Button
                         sx={{ marginLeft: "1rem" }}
                         variant="contained"
-                        onClick={handleFinalSubmit}
+                        onClick={() =>{
+                          if (sub.length !== 0){
+                            formik.values.semesters[currentsem-1].subject.push(sub[0])
+                            sub = []
+                          }
+                          let clr = [...counter];
+                          input.current.reset();
+                          clr.forEach((d, i) => {
+                            // eslint-disable-next-line eqeqeq
+                            if (d == -111) {
+                            } else {
+                              clr[i] = -111;
+                            }
+                          });
+                          setCounter(clr);
+                        }}
                       >
-                        Add Subject
+                      Save Subject for sem {currentsem}
                       </Button>
                     </Grid>
                   </Grid>
                 </Grid>
+                )}
+              />
               </Form>
             )}
           </Formik>

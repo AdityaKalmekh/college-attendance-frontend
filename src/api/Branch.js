@@ -98,10 +98,10 @@ export const getId = async (fName) => {
   }
 }
 
-export const getAllSubjects = async (branch,sem) => {
+export const getNonAllocatedSubjects = async (facultyId,branch,sem,subject) => {
   const data = []
   try {
-    const subjects = await http.get(`/getAllSubjects/${branch}/${sem}`)
+    const subjects = await http.get(`/getNonAllocatedSubjects/${facultyId}/${branch}/${sem}/${subject}`)
     subjects.data.map((subject) => {return data.push(subject)})
   } catch (error) {
     console.error(error);   
