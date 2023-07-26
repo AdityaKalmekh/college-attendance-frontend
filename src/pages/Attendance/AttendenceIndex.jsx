@@ -28,7 +28,7 @@ const AttendenceCollection = () => {
   let [students, setStudents] = useState([])
   const formikRef = useRef();
   const {error,sendRequest : sendTaskRequest} = useHttp();
-  
+
   const [currentRow,setCurrentRow] = useState({
     branch: "",
     semester: "",
@@ -37,6 +37,10 @@ const AttendenceCollection = () => {
     date:`${new Date().getMonth()+1}-${new Date().getDate()}-${new Date().getFullYear()}`
   })
 
+  if (error){
+    toast.error(error);
+  }
+  
   const columns = [
     { field: "id", headerName: "ID", width: 20 },
     {
@@ -64,39 +68,39 @@ const AttendenceCollection = () => {
 
   const changeAttendanceStatus = (e) => {
     const index = e.target.value - 1;
-    students[index].AttendanceStatus === 1 ? students[index].AttendanceStatus = 0 : students[index].AttendanceStatus = 1
-    setStudents([...students])
+    students[index].AttendanceStatus === 1 ? students[index].AttendanceStatus = 0 : students[index].AttendanceStatus = 1;
+    setStudents([...students]);
   }
 
   useEffect(() => {
-    sendTaskRequest({url:`/getFacultyBranch/${id}`,method:"get"},(branch) => {setBranchCollection(branch)})
+    sendTaskRequest({url:`/getFacultyBranch/${id}`,method:"get"},(branch) => {setBranchCollection(branch)});
   }, [sendTaskRequest,id])
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) =>{
-      setCurrentRow(values)
-      sendTaskRequest({url:`/getAttendance/${values.branch}/${values.semester}/${values.subject}/${values.date}/${values.lectureNo}`,method:"get"},(students)=>{setStudents(students)})
+      setCurrentRow(values);
+      sendTaskRequest({url:`/getAttendance/${values.branch}/${values.semester}/${values.subject}/${values.date}/${values.lectureNo}`,method:"get"},(students)=>{setStudents(students)});
     })
   }
 
   const addAttendanceAcknowlegement = (acknowledgment) => {
     if (acknowledgment){
-      toast.success("Attendance Marked Successfully")
-      setStudents([])
+      toast.success("Attendance Marked Successfully");
+      setStudents([]);
     }
   }
 
   const editAttendanceAcknowlegement = (acknowledgment) => {
     if (acknowledgment){
-      toast.success("Attendance Upated Successfully")
-      setStudents([])
+      toast.success("Attendance Upated Successfully");
+      setStudents([]);
     }
   }
 
   const saveData = () => {
     if (students[0].objectId) {
-      const objectId = students[0].objectId
-      students = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
+      const objectId = students[0].objectId;
+      students = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }));
       const data = {
         "objectId" : objectId,
         "lectureNo" : currentRow.lectureNo,
@@ -104,20 +108,15 @@ const AttendenceCollection = () => {
       }
       sendTaskRequest({url:"/editAttendance",data:data,method:"put"},editAttendanceAcknowlegement)
     } else {
-      let presentAbsent = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }))
-      let Attendance = [{ "lectureNo": currentRow.lectureNo, "PresentAbsent": presentAbsent }]
-      console.log({ Attendance });
+      let presentAbsent = students.map(student => ({ "studentId": student._id, "AttendanceStatus": student.AttendanceStatus }));
+      let Attendance = [{ "lectureNo": currentRow.lectureNo, "PresentAbsent": presentAbsent }];
       let data = {
         "Allocation_id": "",
         "Date": currentRow.date,
         Attendance
       }
-      sendTaskRequest({url:"/addAttendance",data:data,method:"post"},addAttendanceAcknowlegement)
+      sendTaskRequest({url:"/addAttendance",data:data,method:"post"},addAttendanceAcknowlegement);
     }
-  }
-
-  if (error){
-    console.log({error});
   }
 
   return (
@@ -151,8 +150,8 @@ const AttendenceCollection = () => {
                 name="branch"
                 value={formik.values.branch}
                 onChange={(e) => {
-                  formik.setFieldValue('branch',e.target.value)
-                  sendTaskRequest({url:`/getFacultySem/${e.target.value}`, method:"get"},(semester)=>{setSemCollection(semester)})
+                  formik.setFieldValue('branch',e.target.value);
+                  sendTaskRequest({url:`/getFacultySem/${e.target.value}`, method:"get"},(semester)=>{setSemCollection(semester)});
                 }}
               >
                 {branchCollection.map((d) => {
@@ -243,7 +242,6 @@ const AttendenceCollection = () => {
               editMode="row"
               const
               rows={students.map((student, index) => ({ ...student, id: index + 1 }))}
-              // rows={rows}
               columns={columns}
               css={css`
                 height: calc(100vh - 1500px - 30px) !important;
@@ -262,5 +260,4 @@ const AttendenceCollection = () => {
     </>
   );
 };
-
 export default AttendenceCollection;

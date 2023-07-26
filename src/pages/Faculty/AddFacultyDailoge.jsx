@@ -13,21 +13,25 @@ import { useRef } from "react";
 import { Form, Formik } from "formik";
 import useHttp from "../../hooks/useHttp";
 
-const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, reloadAfterUpdation }) => {
+const FacultyDialog = ({ open, onCancel, currentRow, reloadNewData, reloadAfterUpdation }) => {
   const formikRef = useRef();
-
   const {error,sendRequest : sendTaskRequest} = useHttp();
 
   const reloadCreateData = (values, id) => {
     if (id){
-      console.log({values});
-      reloadNewData(values,id)
+      toast.success("Added Successfully");
+      reloadNewData({...values,_id:id},id);
+    }else{
+      toast.error(id);
     }
   }
 
   const reloadEditData = (values,acknowledgment) => {
     if (acknowledgment){
-      reloadAfterUpdation(values,acknowledgment)
+      toast.success("Updated Successfully");
+      reloadAfterUpdation(values);
+    }else{
+      toast.error(acknowledgment);
     }
   }
 
@@ -55,13 +59,13 @@ const FacultyDialog = ({ open, onCancel, loadData, currentRow, reloadNewData, re
             },reloadCreateData.bind(null,values))
           }})
         }
-        onCancel()
+        onCancel();
       }
     });
   };
 
   if (error){
-    console.log({error});
+    toast.error(error);
   }
 
   return (

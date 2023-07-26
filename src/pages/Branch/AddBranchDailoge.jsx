@@ -42,7 +42,8 @@ const BranchDailog = ({
 
   const reloadCreateData = (values,id) => {
     if (id){
-      addNewBranch(values)
+      addNewBranch({...values,_id:id});
+      toast.success("Record Added Successfully");
     }
   }
 
@@ -65,7 +66,6 @@ const BranchDailog = ({
       branchname : branch,
       semesters : subSem
     }
-    console.log(branchContainer);
     // const branchContainer = {
     //   branchname: branch,
     //   totalsem: totalsem,
@@ -111,15 +111,6 @@ const BranchDailog = ({
     })
   }
 
-  console.log({
-    addBranchOption: totalSemvalues?.map((option) => ({
-      value: option,
-      label: option,
-    })),
-  });
-
-  console.log(subject);
-
   const addSubject = (index) => (e) => {
     let subject = e.target.value;
     if (sub.length === 0){
@@ -149,7 +140,7 @@ const BranchDailog = ({
     setCounter(d);
   };
 
-  console.log({currentRow});
+
   return (
     <Modal
       title={currentRow._id ? "Update Branch" : "Create Branch"}

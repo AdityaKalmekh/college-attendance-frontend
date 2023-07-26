@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import useHttp from "../../hooks/useHttp";
 
 const FacultyCollection = () => {
+  const {error, sendRequest : fetchTasks} = useHttp();
   const [open, setOpen] = useState(false);
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
@@ -24,22 +25,19 @@ const FacultyCollection = () => {
     password:""
   };
 
-  const {error, sendRequest : fetchTasks} = useHttp();
-
   const loadData = (data) => {
     setFacultyCollection(data);
   };
 
-  const resetAfterDelection = (id,taskData) => {
-    if (taskData){
-      toast.success("Faculty Delete Sucessfully");
+  const resetAfterDelection = (id,response) => {
+    if (response){
+      toast.success("Record Delete Sucessfully");
       const indexDelete = facultyCollection.findIndex(faculty => faculty._id === id)
       setFacultyCollection(prev => prev.filter((_,index) => index !== indexDelete))
     }
   }
 
   const reloadNewData  = (faculty,id) => {
-    toast.success("Faculty Added Sucessfully");
     setFacultyCollection((prev) => prev.concat(faculty));
 
     fetchTasks({
@@ -48,7 +46,7 @@ const FacultyCollection = () => {
       data : {"facultyId":id,"email":faculty.email,"password":faculty.password,"role":"faculty"}
     },(id)=>{if (id){
       return
-    }else {console.log(error)}})
+    }else {toast.error(error)}})
   }
 
   useEffect(() => {
@@ -64,12 +62,11 @@ const FacultyCollection = () => {
     setOpen(false);
   };
 
-  const reloadAfterUpdation = (data,acknowledged) => {
-    if (acknowledged){
+  const reloadAfterUpdation = (data,response) => {
       const indexEdit = facultyCollection.findIndex(faculty => faculty._id === data._id)
       facultyCollection[indexEdit] = data
       setFacultyCollection([...facultyCollection])
-    }
+      toast.success("Data updated successfully");
   }
 
   const handleDeleteClick = (row) => (event) => {
@@ -92,7 +89,7 @@ const FacultyCollection = () => {
   };
 
   if (error){
-    console.log({error});
+    toast.error(error);
   }
 
   const columns = [

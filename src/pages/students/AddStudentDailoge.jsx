@@ -14,19 +14,16 @@ import {
 import * as React from "react";
 import { useRef, useEffect } from "react";
 import { Form, Formik } from "formik";
-import { createStudent, updateStudent } from "../../api/student";
-import { getbranchName, getSem } from "../../api/Branch";
 import { useState } from "react";
 import useHttp from "../../hooks/useHttp";
-import { async } from "@firebase/util";
-import { PropaneSharp } from "@mui/icons-material";
-import FormikController from "../../formik/FormikController";
+import { toast } from "react-toastify";
 
-const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,resetAfterUpdation }) => {
+const StudentDialog = ({ open, onCancel, currentRow,addGetNewStudent,resetAfterUpdation }) => {
   const [viewBranch, setViewBranch] = useState([]);
   const [viewSem, setSem] = useState([]);
   const {error,sendRequest: sendTaskRequest} = useHttp();
-  
+  const formikRef = useRef();
+
   useEffect(() => {
     sendTaskRequest({url:"/branch",method:"get"},(branch)=>{setViewBranch(branch)})
     if (currentRow._id !== ""){
@@ -34,24 +31,26 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
     }
   },[sendTaskRequest,currentRow]);
 
-  const reloadCreateData = (values, id) => {
-    if (id){
-      addGetNewStudent({...values,_id:id})
+  const reloadCreateData = (values, acknowledgementId) => {
+    if (acknowledgementId){
+      addGetNewStudent({...values,_id:acknowledgementId})
+      toast.success("Added Successfully");
+    }else{
+      toast.error(acknowledgementId);
     }
   }
 
-  const reloadEditData = (values,acknowledgment) => {
-    if (acknowledgment){
-      resetAfterUpdation(values,acknowledgment)
+  const reloadEditData = (values,response) => {
+    if (response){
+      toast.success("Updated Successfully");
+      resetAfterUpdation(values);
+    }else{
+      toast.error(response);
     }
   }
-
-  const formikRef = useRef();
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
-      console.log({values});
-      console.log({currentRow});
       if (values) {
         if (currentRow._id) {
           sendTaskRequest({
@@ -72,7 +71,7 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
   };
 
   if (error){
-    console.log(error);
+    toast.error(error);
   }
 
   return (
@@ -181,7 +180,6 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
                         onChange={(e) =>{
                           formik.setFieldValue('course',e.target.value)
                           sendTaskRequest({url:`/semester/${e.target.value}`,method:"get"},(semester)=>setSem(semester))
-                          // getSem(e.target.value).then(setSem);
                         }}>
                         {viewBranch?.map((d) => {
                           return <MenuItem value={d}>{d}</MenuItem>;
@@ -263,5 +261,4 @@ const StudentDialog = ({ open, onCancel, loadData, currentRow,addGetNewStudent,r
     </>
   );
 };
-
 export default StudentDialog;

@@ -1,5 +1,4 @@
 import { Button } from "@mui/material";
-// import { getStudent } from "../../api/student";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
 import StudentDialog from "./AddStudentDailoge";
@@ -9,8 +8,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import AddMultipleStudents from "./AddMultipalStudent";
 import useHttp from "../../hooks/useHttp";
+import { toast } from "react-toastify";
 
 const StudentCollection = () => {
+  const {error,sendRequest: fetchTasks} = useHttp();
   const [open, setOpen] = useState(false);
   const [openAddFileDialog, setOpenAddFileDialog] = useState(false);
   const [studentCollection, setStudentCollection] = useState([]);
@@ -29,35 +30,30 @@ const StudentCollection = () => {
     scontact: "",
   };
 
-  const {error,sendRequest: fetchTasks} = useHttp();
-
   const loadData = (data) => {
-    setStudentCollection(data.studentData);
+    setStudentCollection(data);
   };
 
   const addGetNewStudent = (student) => {
     setStudentCollection((prev) => prev.concat(student));
   }
-
-  console.log({studentCollection});
-
-  const resetAfterDelection = (id,taskData) => {
-    if (taskData){
+  console.log(studentCollection);
+  const resetAfterDelection = (id,response) => {
+    if (response){
+      toast.success("Record Deleted Successfully");
       const indexDelete = studentCollection.findIndex(student => student._id === id)
       setStudentCollection(prev => prev.filter((_,index) => index !== indexDelete))
     }
   }
-
+  
   if (error){
-    console.error({error});
+    toast.error(error);
   }
   
-  const resetAfterUpdation = (data,acknowledged) => {
-    if (acknowledged){
-      const indexEdit = studentCollection.findIndex(student => student._id === data._id)
-      studentCollection[indexEdit] = data
-      setStudentCollection([...studentCollection])
-    }
+  const resetAfterUpdation = (data) => {
+    const indexEdit = studentCollection.findIndex(student => student._id === data._id)
+    studentCollection[indexEdit] = data
+    setStudentCollection([...studentCollection])
   }
 
   useEffect(() => {
@@ -89,8 +85,6 @@ const StudentCollection = () => {
   };
   
   const handleEditClick = (row) => (event) => {
-    console.log(row);
-    console.log(row._id)
     event.stopPropagation();
     setCurrentRow({
       _id : row._id ? row._id :"",
@@ -106,7 +100,6 @@ const StudentCollection = () => {
     });
     setOpen(true);
   };
-
 
   const columns = [
     {field : "id", headerName: "SR.", width:50},
@@ -196,5 +189,4 @@ const StudentCollection = () => {
     </>
   );
 };
-
 export default StudentCollection;

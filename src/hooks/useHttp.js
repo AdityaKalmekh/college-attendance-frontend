@@ -11,7 +11,6 @@ const useHttp = () => {
                 if (!responseData.statusText){
                     throw new Error('Request failed')
                 }
-                console.log(responseData.data);
                 applyData(responseData.data);
             }
             catch(err){
@@ -21,7 +20,6 @@ const useHttp = () => {
             try {
                 const responesData = await http.post(requestConfig.url,requestConfig.data)
                 applyData(responesData.data)
-                console.log(responesData);
                 if (!responesData.statusText){
                     throw new Error('Request failed')    
                 }

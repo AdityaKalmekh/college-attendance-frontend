@@ -1,5 +1,4 @@
 import { Button } from "@mui/material";
-import { getBranch } from "../../api/Branch";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
 import BranchDailog from "./AddBranchDailoge";
@@ -7,67 +6,37 @@ import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-// import { deletestuentData } from "../../api/student";
-import { deletebranchData } from "../../api/Branch";
-// import { async } from "@firebase/util";
+import useHttp from "../../hooks/useHttp";
+import { toast } from "react-toastify";
 
 const BranchCollection = () => {
   const [open, setOpen] = useState(false);
   const [branchCollection, setBranchCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  const [branchArray, setBranchArray] = useState([]);
-  let branchContainer = [];
+  const {error,sendRequest: fetchTasks} = useHttp();
+
+  if (error){
+    toast.error(error);
+  }
 
   const initialValues = {
     _id: "",
     branchname: "",
     semesters: [],
   };
-  // let dt = [];
 
-  // const displayData = (item) => {
-  //   const bname = item?.branch_name;
-  //   const totalsem = item?.semesters.length;
-  //   let totalsub = 0;
-  //   item?.semesters.forEach(function (item2) {
-  //     totalsub += item2?.subject.length;
-  //   });
-  //   setBranchArray((prev) => {
-  //     return [
-  //       ...prev,
-  //       { branch_name: bname, semesters: totalsem, subject: totalsub },
-  //     ];
-  //   });
-  // };
-  
-  const displayData = () => {
-    branchCollection.forEach(item => {
-      branchContainer.push({branch: item.branchname,sem: item.semesters.length}); 
-    }) 
-  }
-  console.log({branchContainer});
+  useEffect(() => {
+    fetchTasks({url:'/getBranch',method:'get'},loadData);
+  }, [fetchTasks]);
 
-  const loadData = () => {
-    getBranch().then(setBranchCollection);
+  const loadData = (data) => {
+    setBranchCollection(data);
   };
 
   const addNewBranch = (newBranch) => {
-    console.log({newBranch});
     setBranchCollection(prev => prev.concat(newBranch))
   }
-  console.log({branchCollection});
   
-  useEffect(() => {
-    loadData();
-    // displayData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
-  useEffect(() => {
-    displayData()
-  },[]);
-
   const handleClickOpen = () => {
     setCurrentRow(initialValues);
     setOpen(true);
@@ -77,16 +46,22 @@ const BranchCollection = () => {
     setOpen(false);
   };
 
+  const afterDelection = (id,taskData) => {
+    if (taskData){
+      const indexdelete = branchCollection.findIndex(branch => branch._id === id);
+      setBranchCollection(prev => prev.filter((_,index)=>index !== indexdelete))
+      toast.success("Record Deleted Successfully");
+    }
+  }
+
   const handleDeleteClick = (row) => (event) => {
-    console.log(row);
-    // event.stopPropagation();
-    // if (window.confirm("Are you sure to delete?") === true) {
-    //   deletebranchData(row);
-    //   loadData();
-    // }
+    event.stopPropagation();
+    if (window.confirm("Are you sure to delete?") === true) {
+      fetchTasks({url : '/deleteBranch',method:'delete',id:row._id},afterDelection.bind(null,row._id))
+    }
   };
+
   const handleEditClick = (row) => (event) => {
-    console.log(row);
     event.stopPropagation();
     setCurrentRow({
       _id : row._id ? row._id : "",
@@ -101,7 +76,7 @@ const BranchCollection = () => {
     { field: "id", headerName: "SR.", width: 50 },
     { field: "branchname", headerName: "Branch Name", width: 150 },
     { field: "totalsem", headerName: "Total Sem", width: 150 },
-    // { field: "tsubname", headerName: "Total Subject", width: 150 },
+    { field: "tsubname", headerName: "Total Subject", width: 150 },
     {
       field: "delete",
       headerName: "Delete",
@@ -133,7 +108,15 @@ const BranchCollection = () => {
       ),
     },
   ];
-  console.log({ branchCollection });
+  
+  const countSubjects = (semesters) => {
+    let totalSubject = 0;
+    semesters.forEach(subject => {
+      totalSubject += subject.subject.length;
+    });
+    return totalSubject;
+  }
+
   return (
     <>
       {open && (
@@ -158,21 +141,10 @@ const BranchCollection = () => {
           rows={branchCollection?.map((branch, index) => ({
             ...branch,
             totalsem : branch.semesters.length,
+            tsubname : countSubjects(branch.semesters),
             id : index+1
-            // return ({
-            //   branchname : branch.branchname,
-            //   totalsem : branch.semesters.length,
-            //   semester : branch.semesters,
-            //   id : index + 1
-            // })
-          })
-            
-          //   ({
-          //   ...branch,
-          //   semesters: branch.semesters.length,
-          //   id: index + 1,
-          // }))}
-  )}
+          })            
+        )}
           columns={columns}
           css={css`
             height: calc(100vh - 1500px - 30px) !important;
@@ -183,5 +155,4 @@ const BranchCollection = () => {
     </>
   );
 };
-
 export default BranchCollection;

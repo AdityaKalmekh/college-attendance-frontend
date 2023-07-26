@@ -1,8 +1,6 @@
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { css } from "@emotion/react";
-// import { getFaculty, deletefacultyData } from "../../api/faculty";
-import { getAllocation, deleteallocationData } from "../../api/allocation";
 import AllocationDialog from "./AddAllocationDialog";
 import { useState, useEffect } from "react";
 import { GridActionsCellItem } from "@mui/x-data-grid";
@@ -15,7 +13,11 @@ const AllocationCollection = () => {
   const [open, setOpen] = useState(false);
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [currentRow, setCurrentRow] = useState();
-  const {sendRequest : sendTaskRequest} = useHttp();
+  const {error,sendRequest : sendTaskRequest} = useHttp();
+
+  if (error){
+    toast.error(error);
+  }
 
   const initialValues = {
     _id : "",
@@ -23,14 +25,14 @@ const AllocationCollection = () => {
     branch: "",
     semester: "",
     subject: "",
+    facultyId : ""
   };
 
   const addNewAllocation = (newAllocation) => {
     setFacultyCollection((prev) => prev.concat(newAllocation))
   }
-
+  
   const reloadAfterDeletion = (id,acknowledgment) => {
-    console.log(acknowledgment);
     if (acknowledgment){
       toast.success("Allocated Faculty Delete Sucessfully");
       const indexDelete = facultyCollection.findIndex(faculty => faculty._id === id)
@@ -39,12 +41,11 @@ const AllocationCollection = () => {
   }
 
   const reloadAfterUpdation = (data) => {
-      const indexEdit = facultyCollection.findIndex(faculty => faculty._id === data._id)
-      facultyCollection[indexEdit] = data
-      setFacultyCollection([...facultyCollection])
+    const indexEdit = facultyCollection.findIndex(faculty => faculty._id === data._id);
+    facultyCollection[indexEdit] = data;
+    setFacultyCollection([...facultyCollection]);
   }
 
-  console.log(facultyCollection);
   const loadData = (data) => {
     setFacultyCollection(data);
   };
@@ -66,7 +67,6 @@ const AllocationCollection = () => {
     event.stopPropagation();
     if (window.confirm("Are you sure to delete?") === true) {
       sendTaskRequest({url:"/deleteAllocation",method:"delete",id:row._id},reloadAfterDeletion.bind(null,row._id))
-      // deleteallocationData(row).then(loadData);
     }
   };
   

@@ -16,24 +16,22 @@ import * as React from "react";
 import { useRef } from "react";
 import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
-import { createAllocation, updateAllocation } from "../../api/allocation";
-import { getFaculty } from "../../api/faculty";
 import { getbranchName, getSem, getSubject, getId, getNonAllocatedSubjects } from "../../api/Branch";
 import { useState, useEffect } from "react";
 import useHttp from "../../hooks/useHttp";
 
-const AllocationDialog = ({ open, onCancel, loadData, currentRow,addNewAllocation,reloadAfterUpdation }) => {
+const AllocationDialog = ({ open, onCancel, currentRow,addNewAllocation,reloadAfterUpdation }) => {
+  const {error,sendRequest : sendTaskRequest} = useHttp();
   const [facultyCollection, setFacultyCollection] = useState([]);
   const [branchCollection, setBranchCollection] = useState([]);
   const [semCollection, setSemCollection] = useState([]);
   const [subjectCollection, setSubjectCollection] = useState([]);
   const [id,setId] = useState();
+  const formikRef = useRef();
 
-  const {error,sendRequest : sendTaskRequest} = useHttp();
-  
   useEffect(() => {
-    sendTaskRequest({url:"/getFaculty",method:"get"},(data)=>{setFacultyCollection(data)})
-    sendTaskRequest({url:"/branch",method:"get"},(branch)=>{setBranchCollection(branch)})
+    sendTaskRequest({url:"/getFaculty",method:"get"},(data)=>{setFacultyCollection(data)});
+    sendTaskRequest({url:"/branch",method:"get"},(branch)=>{setBranchCollection(branch)});
     if (currentRow._id !== ""){
       sendTaskRequest({url:`/semester/${currentRow.branch}`,method:"get"},(semester)=>{setSemCollection(semester)})
       sendTaskRequest({url:`/getNonAllocatedSubjects/${currentRow.facultyId}/${currentRow.branch}/${currentRow.semester}/${currentRow.subject}`,method:"get"},(subject)=>{setSubjectCollection(subject)})
@@ -41,17 +39,19 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow,addNewAllocatio
     }
   },[sendTaskRequest,currentRow]);
    
-  
-  const formikRef = useRef();
-  const reloadCreateData = (values, id) => {
-    if (id){
-      addNewAllocation(values)
+  const reloadCreateData = (values,acknowledgementId) => {
+    if (acknowledgementId){
+      addNewAllocation({...values,_id:acknowledgementId,facultyId:id});
+      toast.success("Allocated Successfully");
+    }else{
+      toast.error(id);
     }
   }
 
   const reloadEditData = (values,acknowledgment) => {
     if (acknowledgment){
-      reloadAfterUpdation(values)
+      reloadAfterUpdation(values);
+      toast.success("Record Updated Successfully");
     }
   }
 
@@ -79,7 +79,7 @@ const AllocationDialog = ({ open, onCancel, loadData, currentRow,addNewAllocatio
   };
 
   if (error){
-    console.error(error);
+    toast.error(error);
   }
 
   return (
