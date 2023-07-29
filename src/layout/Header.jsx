@@ -11,6 +11,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import SchoolIcon from "@mui/icons-material/School";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import {
   Box,
   Divider,
@@ -73,7 +74,6 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-
 const AdminDRAWER_ITEMS = [
   {
     route: "/users",
@@ -111,9 +111,8 @@ const AdminDRAWER_ITEMS = [
   {
     route: "/report",
     literal: "report",
-    Icon: QueryStatsIcon,
+    Icon: AssessmentIcon,
   },
-
 ];
 
 const FacultyDrawer_Item = [
@@ -122,14 +121,14 @@ const FacultyDrawer_Item = [
     literal: "AttendenceCollection",
     Icon: AutoStoriesIcon,
   },
-]
-
+];
 
 const Header = () => {
   const { isDrawerOpened, toggleDrawer } = useLayoutContext();
 
   const { user, logout } = useAuthContext();
-  const DRAWER_ITEMS = user === "faculty" ? FacultyDrawer_Item : AdminDRAWER_ITEMS;
+  const DRAWER_ITEMS =
+    user === "faculty" ? FacultyDrawer_Item : AdminDRAWER_ITEMS;
   // const [open, setOpen] = useState(false);
   const mainListItems = (
     <>
