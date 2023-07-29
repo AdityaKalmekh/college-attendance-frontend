@@ -4,17 +4,14 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { Button, Typography } from "@mui/material";
 import FormikController from "../../formik/FormikController";
-import { createUserSignup } from "../../api/Signup";
 import { loginButtonWidth } from "../../components/login/loginStyles";
 import useHttp from "../../hooks/useHttp";
 
 const SignupForm = () => {
   // const formikRef = useRef();
   const initialValues = {
-    username: "",
     email: "",
     password: "",
-    confirmpassword: "",
   };
 
   const {sendRequest : sendTaskRequest} = useHttp();
@@ -40,14 +37,23 @@ const SignupForm = () => {
     if (values) {
       // createUserSignup(values)
       sendTaskRequest({
-        url:"/addUser",
-        method:"post",
-        data : values},loadNewUser.bind(null,values)).then(() => {
-          resetForm();
-        })
-        .catch((err) => {
-          toast.error(err.message);
-        });
+        url : "/checkEmail",
+        method : "post",
+        data : values
+      },(data) => {if (data.length > 0){
+        toast.error("User already exists");
+        resetForm();
+      }else{
+        sendTaskRequest({
+          url:"/addUser",
+          method:"post",
+          data : values},loadNewUser.bind(null,values)).then(() => {
+            resetForm();
+          })
+          .catch((err) => {
+            toast.error(err.message);
+          });
+      }})
     } else {
       toast.error("Something went wrong");
     }
@@ -67,17 +73,6 @@ const SignupForm = () => {
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
               Signup
             </Typography>
-            <FormikController
-              control="input"
-              type="text"
-              label="User Name"
-              name="username"
-              fullWidth
-              value={formik.values.username}
-              onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
-            />
             <br />
             <br />
             <FormikController
@@ -103,24 +98,6 @@ const SignupForm = () => {
               onChange={formik.handleChange}
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
-            />
-            <br />
-            <br />
-            <FormikController
-              control="input"
-              type="password"
-              label="Confirm Password"
-              name="confirmpassword"
-              fullWidth
-              value={formik.values.confirmpassword}
-              onChange={formik.handleChange}
-              error={
-                formik.touched.confirmpassword &&
-                Boolean(formik.errors.confirmpassword)
-              }
-              helperText={
-                formik.touched.confirmpassword && formik.errors.confirmpassword
-              }
             />
             <br />
             <br />

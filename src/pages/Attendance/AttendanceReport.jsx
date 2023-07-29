@@ -50,6 +50,7 @@ const AttendanceReport = () => {
         if (!data){
             toast.error("Data Not Found");
         }else{
+            console.log(data);
             setPdf(data);
         }
     };

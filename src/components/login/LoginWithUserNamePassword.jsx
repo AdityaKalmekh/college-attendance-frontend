@@ -21,7 +21,6 @@ const LoginWithUserNamePassword = () => {
     password: Yup.string().required("Required"),
   });
 
-
   const onSubmit = (values, { resetForm }) => {
 
     if (values) {
@@ -35,7 +34,8 @@ const LoginWithUserNamePassword = () => {
                       authctx.onLogin()
                       authctx.idHandler(data[0].facultyId)
                     } else {
-                      console.log("user not exist")}
+                      toast.error("user not exist")}
+                      resetForm();
                   })
       // setTimeout(() => {console.log(authctx.user)},5000);
       // console.log(authctx.user);

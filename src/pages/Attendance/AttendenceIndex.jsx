@@ -169,7 +169,7 @@ const AttendenceCollection = () => {
                 value={formik.values.semester}
                 onChange={(e) => {
                   formik.setFieldValue('semester',e.target.value)
-                  sendTaskRequest({url:`/subject/${formik.values.branch}/${e.target.value}`,method:"get"},(subject) => {setSubjectCollection(subject)})
+                  sendTaskRequest({url:`/getFacultySubject/${e.target.value}`,method:"get"},(subject) => {setSubjectCollection(subject)})
                 }}
               >
                 {semCollection?.map((d, i) => {

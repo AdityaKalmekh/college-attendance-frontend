@@ -57,9 +57,7 @@ const AllocationDialog = ({ open, onCancel, currentRow,addNewAllocation,reloadAf
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) => {
-      console.log(values);
       if (values){
-        console.log({currentRow});
         if (currentRow._id){  
           sendTaskRequest({
             url : '/editAllocation',
