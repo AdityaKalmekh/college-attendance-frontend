@@ -37,7 +37,7 @@ const StudentCollection = () => {
   const addGetNewStudent = (student) => {
     setStudentCollection((prev) => prev.concat(student));
   }
-  console.log(studentCollection);
+  
   const resetAfterDelection = (id,response) => {
     if (response){
       toast.success("Record Deleted Successfully");
