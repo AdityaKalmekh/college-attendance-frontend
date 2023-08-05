@@ -16,7 +16,6 @@ import * as React from "react";
 import { useRef } from "react";
 import { Form, Formik } from "formik";
 import FormikController from "../../formik/FormikController";
-import { getbranchName, getSem, getSubject, getId, getNonAllocatedSubjects } from "../../api/Branch";
 import { useState, useEffect } from "react";
 import useHttp from "../../hooks/useHttp";
 

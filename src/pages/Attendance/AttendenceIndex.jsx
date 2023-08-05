@@ -74,12 +74,12 @@ const AttendenceCollection = () => {
 
   useEffect(() => {
     sendTaskRequest({url:`/getFacultyBranch/${id}`,method:"get"},(branch) => {setBranchCollection(branch)});
-  }, [sendTaskRequest,id])
+  }, [sendTaskRequest,id]);
 
   const onSubmit = () => {
     formikRef.current.submitForm().then((values) =>{
       setCurrentRow(values);
-      sendTaskRequest({url:`/getAttendance/${values.branch}/${values.semester}/${values.subject}/${values.date}/${values.lectureNo}`,method:"get"},(students)=>{setStudents(students)});
+      sendTaskRequest({url:`/getAttendance/${values.branch}/${values.semester}/${values.subject}/${values.date}/${values.lectureNo}`,method:"get"},(students) => setStudents(students));
     })
   }
 
@@ -87,6 +87,8 @@ const AttendenceCollection = () => {
     if (acknowledgment){
       toast.success("Attendance Marked Successfully");
       setStudents([]);
+    }else{
+      toast.error("Invalid Lecture No");
     }
   }
 
@@ -94,6 +96,8 @@ const AttendenceCollection = () => {
     if (acknowledgment){
       toast.success("Attendance Upated Successfully");
       setStudents([]);
+    }else{
+      toast.error("Invalid Lecture No")
     }
   }
 

@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getUsers } from "../api/users";
-import { getStudent } from "../api/student";
 
 const UsersContext = createContext({
   users: [],
@@ -12,13 +11,9 @@ const UsersContext = createContext({
 
 export const GlobalContextProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
-  const [student, setStudents] = useState([]);
 
   useEffect(() => {
     getUsers().then(setUsers);
-    getStudent().then((res) => {
-      setStudents(res);
-    });
   }, []);
 
   const userNameMap = useMemo(() => {
@@ -46,9 +41,8 @@ export const GlobalContextProvider = ({ children }) => {
       setUsers,
       userNameMap,
       usersOptions,
-      student,
     }),
-    [users, userNameMap, usersOptions, student]
+    [users, userNameMap, usersOptions]
   );
   return (
     <UsersContext.Provider value={value}>{children}</UsersContext.Provider>

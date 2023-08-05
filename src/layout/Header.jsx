@@ -125,8 +125,9 @@ const FacultyDrawer_Item = [
 
 const Header = () => {
   const { isDrawerOpened, toggleDrawer } = useLayoutContext();
+  const { user } = useAuthContext();
 
-  const { user, logout } = useAuthContext();
+  const { logout } = useAuthContext();
   const DRAWER_ITEMS =
     user === "faculty" ? FacultyDrawer_Item : AdminDRAWER_ITEMS;
   // const [open, setOpen] = useState(false);
@@ -196,7 +197,7 @@ const Header = () => {
             {/* Home */}
           </Typography>
           <Typography component="h1" variant="h6" color="inherit" noWrap>
-            {user?.displayName || "-"} ( {user?.role || "-"} )
+            {user?.displayName || "-"} ( {user|| "-"} )
           </Typography>
           {/* <div css={{ position: "relative" }}>
             <Notifications open={open} setOpen={setOpen} />
