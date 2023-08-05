@@ -1,9 +1,6 @@
-import { Box, Typography, Link } from "@mui/material";
-import { useGlobalContext } from "../context/GlobalContext";
+import { Box, Typography } from "@mui/material";
 
 function Copyright({ textSx }) {
-  const { company } = useGlobalContext();
-
   return (
     <Box
       sx={{
